@@ -49,7 +49,10 @@ def train(args, model, device='cuda:0'):
             optimizer.step()
 
             # Update sliding window buffer
-            replay_loader.sampler.rehearsal_ixs = replay_loader.sampler.rehearsal_ixs[1:] + [dataset.samples[step]]
+            if step < args.buffer_size:
+            	replay_loader.sampler.rehearsal_ixs += [dataset.samples[step]]
+            else:
+            	replay_loader.sampler.rehearsal_ixs = replay_loader.sampler.rehearsal_ixs[1:] + [dataset.samples[step]]
 
             if step % args.print_freq == 0:
                 stats = dict(epoch=epoch, step=step,
