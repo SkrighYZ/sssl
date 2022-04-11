@@ -2,8 +2,17 @@ import os
 import argparse
 import json
 import time
-import torch
 import numpy as np
+import math
+import random
+import sys
+
+from torch import optim, nn
+import torch
+
+from models import BarlowTwins
+
+from loading_utils import get_stream_data_loader
 
 
 def train(args, model, device='cuda:0'):
@@ -13,8 +22,8 @@ def train(args, model, device='cuda:0'):
     optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
 
     # automatically resume from checkpoint if it exists
-    if (args.checkpoint_dir / 'checkpoint.pth').is_file():
-        ckpt = torch.load(args.checkpoint_dir / 'checkpoint.pth', map_location='cpu')
+    if (args.save_dir+'/checkpoint.pth').is_file():
+        ckpt = torch.load(args.save_dir+'/checkpoint.pth', map_location='cpu')
         start_epoch = ckpt['epoch']
         model.load_state_dict(ckpt['model'])
         optimizer.load_state_dict(ckpt['optimizer'])
@@ -62,9 +71,9 @@ def train(args, model, device='cuda:0'):
                 print(json.dumps(stats))
 
         state = dict(epoch=epoch, model=model.state_dict(), optimizer=optimizer.state_dict())
-        torch.save(state, args.checkpoint_dir / 'checkpoint.pth')
+        torch.save(state, args.save_dir+'/checkpoint.pth')
 
-    torch.save(model.backbone.state_dict(), args.checkpoint_dir / 'resnet50.pth')
+    torch.save(model.backbone.state_dict(), args.save_dir+'/resnet50.pth')
 
     return model
 
@@ -78,7 +87,6 @@ def main():
     parser.add_argument('--save_dir', type=str)
     parser.add_argument('--expt_name', type=str)
     parser.add_argument('--order', type=str, choices=['iid', 'instance'])
-    parser.add_argument('--ckpt_file', type=str, default=None)
     parser.add_argument('--model', type=str, default='sliding_bt',
                         choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
@@ -92,6 +100,9 @@ def main():
 
     parser.add_argument('--seed', type=int, default=10)
 
+    parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
+    parser.add_argument('--lambd', default=0.0051, type=float, metavar='L', help='weight on off-diagonal terms')
+
     args = parser.parse_args()
     print("Arguments {}".format(json.dumps(vars(args), indent=4, sort_keys=True)))
 
@@ -99,7 +110,7 @@ def main():
         os.makedirs(args.save_dir)
 
     if args.model == 'sliding_bt':
-        model = BarlowTwins(batch_size)
+        model = BarlowTwins(args)
     else:
         raise NotImplementedError('Model not supported.')
 

@@ -1,5 +1,4 @@
 import os
-import os.path
 import random
 import json
 from PIL import Image
