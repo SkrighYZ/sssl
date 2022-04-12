@@ -3,7 +3,7 @@ import random
 import json
 from PIL import Image
 import torch.utils.data as data
-import deepcopy
+import copy
 
 
 def instance_ordering(data_list):
@@ -117,7 +117,7 @@ class Stream51Dataset(data.Dataset):
         """
         if self.ordering == 'iid':
             # shuffle all data
-            self.samples = deepcopy.copy(self.data_list)
+            self.samples = copy.deepcopy(self.data_list)
             random.shuffle(self.samples)
             self.targets = [s[0] for s in self.samples]
         elif self.ordering == 'instance':
