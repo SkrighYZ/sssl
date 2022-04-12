@@ -45,6 +45,15 @@ def train(args, model, device='cuda:0'):
 			if step < args.batch_size-1:
 				continue
 
+			# Update sliding window buffer
+			if step < args.buffer_size:
+				replay_sampler.rehearsal_ixs += [step]
+			else:
+				replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
+
+			if step+1 % args.batch_size != 0:
+				continue
+
 			y1 = y1.cuda(non_blocking=True)
 			y2 = y2.cuda(non_blocking=True)
 
@@ -59,12 +68,6 @@ def train(args, model, device='cuda:0'):
 			loss = model(y1_inputs, y2_inputs)
 			loss.backward()
 			optimizer.step()
-
-			# Update sliding window buffer
-			if step < args.buffer_size:
-				replay_sampler.rehearsal_ixs += [step]
-			else:
-				replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
 
 			if step % args.print_freq == 0:
 				stats = dict(epoch=epoch,
@@ -94,10 +97,10 @@ def main():
 	parser.add_argument('--dataset', type=str, default='stream51', choices=['stream51'])
 	parser.add_argument('--order', type=str, default='instance', choices=['iid', 'instance'])
 	parser.add_argument('--model', type=str, default='sliding_bt',
-						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
+						choices=['sliding_bt', 'sliding_simclr', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
-	parser.add_argument('--batch_size', type=int, default=32)
-	parser.add_argument('--buffer_size', type=int, default=200)
+	parser.add_argument('--batch_size', type=int, default=64)
+	parser.add_argument('--buffer_size', type=int, default=63)
 
 	parser.add_argument('--epochs', type=int, default=1)
 	parser.add_argument('--learning_rate', type=float, default=0.2)
