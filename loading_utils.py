@@ -35,7 +35,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         # when we see 101th sample, we want to replay from 0-100 samples instead of 0-99.
 
         while True:
-            print('i', self.rehearsal_ixs)
             #ix = np.random.randint(0, len(self.rehearsal_ixs), self.num_rehearsal_samples)
             ix = self.rng.choice(len(self.rehearsal_ixs), self.num_rehearsal_samples, replace=False)
             yield np.array([self.rehearsal_ixs[_curr_ix] for _curr_ix in ix])
