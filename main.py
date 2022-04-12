@@ -41,7 +41,7 @@ def train(args, model, device='cuda:0'):
 		replay_iter = iter(replay_loader)
 
 		for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
-			print('o', len(replay_loader.sampler.rehearsal_ixs))
+			print('o', len(replay_loader.sampler))
 			
 			if step < args.batch_size-1:
 				continue
