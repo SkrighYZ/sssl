@@ -2,7 +2,8 @@ import numpy as np
 import random
 
 from PIL import Image, ImageOps, ImageFilter
-from torch.utils.data import Subset, DataLoader
+import torch
+from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
 
 from Stream51Dataset import Stream51Dataset
