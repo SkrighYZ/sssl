@@ -84,7 +84,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--dataset', type=str, default='stream51', choices=['stream51'])
-    parser.add_argument('--order', type=str, default='isntance', choices=['iid', 'instance'])
+    parser.add_argument('--order', type=str, default='instance', choices=['iid', 'instance'])
     parser.add_argument('--model', type=str, default='sliding_bt',
                         choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
