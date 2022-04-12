@@ -98,7 +98,7 @@ def main():
     parser.add_argument('--momentum', default=0.9, type=float)
 
     parser.add_argument('--seed', type=int, default=10)
-    parser.add_argument('--num_workers', type=int, default=8)
+    parser.add_argument('--num_workers', type=int, default=4)
     parser.add_argument('--print-freq', default=5, type=int, metavar='N', help='print frequency')
 
     parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
