@@ -56,7 +56,7 @@ def get_stream_data_loaders(images_dir, dataset_name, ordering, batch_size, shuf
     replay_sampler = RehearsalBatchSampler(rehearsal_ixs=[], num_rehearsal_samples=batch_size-1)
     replay_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=num_workers, pin_memory=True)
 
-    return dataset, train_loader, replay_loader
+    return dataset, train_loader, replay_loader, replay_sampler
 
 
 
