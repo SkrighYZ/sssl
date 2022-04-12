@@ -21,14 +21,14 @@ def train(args, model, device='cuda:0'):
 	model.to(device)
 
 	param_weights = []
-    param_biases = []
-    for param in model.parameters():
-        if param.ndim == 1:
-            param_biases.append(param)
-        else:
-            param_weights.append(param)
-    parameters = [{'params': param_weights, 'lr': args.learning_rate_weights}, 
-    			{'params': param_biases, 'lr': args.learning_rate_biases}]
+	param_biases = []
+	for param in model.parameters():
+		if param.ndim == 1:
+			param_biases.append(param)
+		else:
+			param_weights.append(param)
+	parameters = [{'params': param_weights, 'lr': args.learning_rate_weights}, 
+				{'params': param_biases, 'lr': args.learning_rate_biases}]
 	optimizer = optim.SGD(parameters, lr=args.learning_rate_weights, momentum=args.momentum, weight_decay=args.weight_decay)
 
 	# automatically resume from checkpoint if it exists
