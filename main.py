@@ -90,8 +90,8 @@ def main():
 	parser.add_argument('--model', type=str, default='sliding_bt',
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
-	parser.add_argument('--batch_size', type=int, default=4)
-	parser.add_argument('--buffer_size', type=int, default=6)
+	parser.add_argument('--batch_size', type=int, default=64)
+	parser.add_argument('--buffer_size', type=int, default=200)
 
 	parser.add_argument('--epochs', type=int, default=100)
 	parser.add_argument('--learning_rate', type=float, default=0.2)
