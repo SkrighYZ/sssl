@@ -3,6 +3,7 @@ import random
 import json
 from PIL import Image
 import torch.utils.data as data
+import deepcopy
 
 
 def instance_ordering(data_list):
