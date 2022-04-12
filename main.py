@@ -32,18 +32,20 @@ def train(args, model, device='cuda:0'):
 		start_epoch = 0
 
 	dataset, train_loader, replay_loader = get_stream_data_loaders(args.images_dir, args.dataset, args.order, args.batch_size, num_workers=args.num_workers)
-	replay_loader.sampler.rehearsal_ixs = list(range(args.batch_size-1))
-	print(len(replay_loader.sampler.rehearsal_ixs))
+
 	start_time = time.time()
 	for epoch in range(start_epoch, args.epochs):
 
 		dataset.shuffle()
-		#replay_loader.sampler.rehearsal_ixs = list(range(args.batch_size-1))
+		replay_loader.sampler.rehearsal_ixs = list(range(args.batch_size-1))
 		replay_iter = iter(replay_loader)
 
 		for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
-			if step < args.args.batch_size-1:
+			print('o', len(replay_loader.sampler.rehearsal_ixs))
+			
+			if step < args.batch_size-1:
 				continue
+				
 			y1 = y1.cuda(non_blocking=True)
 			y2 = y2.cuda(non_blocking=True)
 
