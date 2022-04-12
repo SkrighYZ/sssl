@@ -109,7 +109,7 @@ def main():
 
 	parser.add_argument('--seed', type=int, default=10)
 	parser.add_argument('--num_workers', type=int, default=4)
-	parser.add_argument('--print-freq', default=1000, type=int, metavar='N', help='print frequency')
+	parser.add_argument('--print-freq', default=1, type=int, metavar='N', help='print frequency')
 	parser.add_argument('--save-freq', default=10000, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
