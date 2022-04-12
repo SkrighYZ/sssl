@@ -67,10 +67,12 @@ def train(args, model, device='cuda:0'):
 				replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
 
 			if step % args.print_freq == 0:
-				stats = dict(epoch=epoch, 
-							 lr=optimizer.param_groups[0]['lr'],
-							 loss=loss.item(),
-							 time=int(time.time() - start_time))
+				stats = dict(epoch=epoch,
+							step=step,
+							total=len(train_loader), 
+							lr=optimizer.param_groups[0]['lr'],
+							loss=loss.item(),
+							time=int(time.time() - start_time))
 				print(json.dumps(stats))
 
 		state = dict(epoch=epoch, model=model.state_dict(), optimizer=optimizer.state_dict())
