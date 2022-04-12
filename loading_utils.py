@@ -44,17 +44,22 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         # The stop criteria must be defined in some other manner.
 
 
-def get_stream_data_loaders(images_dir, dataset_name, ordering, batch_size, shuffle=False, num_workers=8):
+def get_stream_data_loaders(args, shuffle=False):
 
-    if dataset_name == 'stream51':
-        dataset = Stream51Dataset(images_dir, ordering=ordering, transform=Transform(), bbox_crop=True, ratio=1.10)
+    if args.dataset == 'stream51':
+        dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=Transform(), bbox_crop=True, ratio=1.10)
     else:
         raise NotImplementedError
 
-    train_loader = DataLoader(dataset, batch_size=1, shuffle=shuffle, num_workers=num_workers, pin_memory=True)
+    batch_size = args.batch_size if 'sliding' in args.model else 1
+    train_loader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=args.num_workers, pin_memory=True)
 
-    replay_sampler = RehearsalBatchSampler(rehearsal_ixs=[], num_rehearsal_samples=batch_size-1)
-    replay_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=num_workers, pin_memory=True)
+    if 'sliding' in args.model:
+        replay_sampler = None
+        replay_loader = None
+    else:
+        replay_sampler = RehearsalBatchSampler(rehearsal_ixs=[], num_rehearsal_samples=args.batch_size-1)
+        replay_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     return dataset, train_loader, replay_loader, replay_sampler
 
