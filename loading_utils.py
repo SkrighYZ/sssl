@@ -44,7 +44,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 def get_stream_data_loaders(images_dir, dataset_name, ordering, batch_size=128, shuffle=False, num_workers=8):
 
     if dataset_name == 'stream51':
-        dataset = StreamDataset(images_dir, ordering=ordering, transform=transform, bbox_crop=True, ratio=1.10)
+        dataset = Stream51Dataset(images_dir, ordering=ordering, transform=transform, bbox_crop=True, ratio=1.10)
     else:
         raise NotImplementedError
 
