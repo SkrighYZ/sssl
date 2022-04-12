@@ -113,7 +113,7 @@ def main():
         os.makedirs(args.save_dir)
 
     if args.model == 'sliding_bt':
-    	torch.manual_seed(args.seed)
+        torch.manual_seed(args.seed)
         model = BarlowTwins(args)
     else:
         raise NotImplementedError('Model not supported.')
