@@ -37,7 +37,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         while True:
             #ix = np.random.randint(0, len(self.rehearsal_ixs), self.num_rehearsal_samples)
             ix = self.rng.choice(len(self.rehearsal_ixs), self.num_rehearsal_samples, replace=False)
-            print(np.array([self.rehearsal_ixs[_curr_ix] for _curr_ix in ix]))
             yield np.array([self.rehearsal_ixs[_curr_ix] for _curr_ix in ix])
 
     def __len__(self):
