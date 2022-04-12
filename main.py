@@ -41,7 +41,6 @@ def train(args, model, device='cuda:0'):
 		replay_iter = iter(replay_loader)
 
 		for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
-			print('o', replay_loader.sampler)
 			
 			if step < args.batch_size-1:
 				continue
@@ -100,7 +99,7 @@ def main():
 	parser.add_argument('--momentum', default=0.9, type=float)
 
 	parser.add_argument('--seed', type=int, default=10)
-	parser.add_argument('--num_workers', type=int, default=1)
+	parser.add_argument('--num_workers', type=int, default=4)
 	parser.add_argument('--print-freq', default=5, type=int, metavar='N', help='print frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
