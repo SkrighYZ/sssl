@@ -93,6 +93,7 @@ def main():
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--learning_rate', type=float, default=0.2)
     parser.add_argument('--weight_decay', type=float, default=1e-6)
+    parser.add_argument('--momentum', default=0.9, type=float)
 
     parser.add_argument('--seed', type=int, default=10)
     parser.add_argument('--print-freq', default=5, type=int, metavar='N', help='print frequency')
