@@ -31,7 +31,7 @@ def train(args, model, device='cuda:0'):
     else:
         start_epoch = 0
 
-    dataset, train_loader, replay_loader = get_stream_data_loaders(args.images_dir, args.dataset, args.order, args.batch_size)
+    dataset, train_loader, replay_loader = get_stream_data_loaders(args.images_dir, args.dataset, args.order, args.batch_size, num_workers=args.num_workers)
 
     start_time = time.time()
     for epoch in range(start_epoch, args.epochs):
@@ -97,6 +97,7 @@ def main():
     parser.add_argument('--momentum', default=0.9, type=float)
 
     parser.add_argument('--seed', type=int, default=10)
+    parser.add_argument('--num_workers', type=int, default=8)
     parser.add_argument('--print-freq', default=5, type=int, metavar='N', help='print frequency')
 
     parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')

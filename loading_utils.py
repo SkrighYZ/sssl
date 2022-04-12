@@ -42,7 +42,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         # The stop criteria must be defined in some other manner.
 
 
-def get_stream_data_loaders(images_dir, dataset_name, ordering, batch_size=128, shuffle=False, num_workers=8):
+def get_stream_data_loaders(images_dir, dataset_name, ordering, batch_size=64, shuffle=False, num_workers=8):
 
     if dataset_name == 'stream51':
         dataset = Stream51Dataset(images_dir, ordering=ordering, transform=Transform(), bbox_crop=True, ratio=1.10)
@@ -52,7 +52,7 @@ def get_stream_data_loaders(images_dir, dataset_name, ordering, batch_size=128, 
     train_loader = DataLoader(dataset, batch_size=1, shuffle=shuffle, num_workers=num_workers, pin_memory=True)
 
     replay_sampler = RehearsalBatchSampler(rehearsal_ixs=[], num_rehearsal_samples=batch_size-1)
-    replay_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.workers, pin_memory=True)
+    replay_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=num_workers, pin_memory=True)
 
     return dataset, train_loader, replay_loader
 
