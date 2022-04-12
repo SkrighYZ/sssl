@@ -100,9 +100,8 @@ def main():
     parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
     parser.add_argument('--lambd', default=0.0051, type=float, metavar='L', help='weight on off-diagonal terms')
 
-    parser.add_argument('--images_dir', type=str)
+    parser.add_argument('--images_dir', type=str, default='../data/Stream-51')
     parser.add_argument('--save_dir', type=str)
-    parser.add_argument('--expt_name', type=str)
 
     args = parser.parse_args()
     print("Arguments {}".format(json.dumps(vars(args), indent=4, sort_keys=True)))
