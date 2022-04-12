@@ -6,6 +6,7 @@ import numpy as np
 import math
 import random
 import sys
+from pathlib import Path
 
 from torch import optim, nn
 import torch
@@ -22,8 +23,8 @@ def train(args, model, device='cuda:0'):
     optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
 
     # automatically resume from checkpoint if it exists
-    if (args.save_dir+'/checkpoint.pth').is_file():
-        ckpt = torch.load(args.save_dir+'/checkpoint.pth', map_location='cpu')
+    if (args.save_dir / 'checkpoint.pth').is_file():
+        ckpt = torch.load(args.save_dir / 'checkpoint.pth', map_location='cpu')
         start_epoch = ckpt['epoch']
         model.load_state_dict(ckpt['model'])
         optimizer.load_state_dict(ckpt['optimizer'])
@@ -71,9 +72,9 @@ def train(args, model, device='cuda:0'):
                 print(json.dumps(stats))
 
         state = dict(epoch=epoch, model=model.state_dict(), optimizer=optimizer.state_dict())
-        torch.save(state, args.save_dir+'/checkpoint.pth')
+        torch.save(state, args.save_dir / 'checkpoint.pth')
 
-    torch.save(model.backbone.state_dict(), args.save_dir+'/resnet50.pth')
+    torch.save(model.backbone.state_dict(), args.save_dir / 'resnet50.pth')
 
     return model
 
@@ -101,8 +102,8 @@ def main():
     parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
     parser.add_argument('--lambd', default=0.0051, type=float, metavar='L', help='weight on off-diagonal terms')
 
-    parser.add_argument('--images_dir', type=str, default='../data/Stream-51')
-    parser.add_argument('--save_dir', type=str)
+    parser.add_argument('--images_dir', type=Path, metavar='DIR', default='../data/Stream-51')
+    parser.add_argument('--save_dir', type=Path, metavar='DIR')
 
     args = parser.parse_args()
     print("Arguments {}".format(json.dumps(vars(args), indent=4, sort_keys=True)))
