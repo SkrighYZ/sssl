@@ -95,7 +95,7 @@ def main():
 	parser.add_argument('--batch_size', type=int, default=64)
 	parser.add_argument('--buffer_size', type=int, default=100)
 
-	parser.add_argument('--epochs', type=int, default=100)
+	parser.add_argument('--epochs', type=int, default=10)
 	parser.add_argument('--learning_rate', type=float, default=0.2)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
 	parser.add_argument('--momentum', default=0.9, type=float)
