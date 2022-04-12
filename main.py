@@ -20,7 +20,16 @@ def train(args, model, device='cuda:0'):
 
 	model.to(device)
 
-	optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
+	param_weights = []
+    param_biases = []
+    for param in model.parameters():
+        if param.ndim == 1:
+            param_biases.append(param)
+        else:
+            param_weights.append(param)
+    parameters = [{'params': param_weights, 'lr': args.learning_rate_weights}, 
+    			{'params': param_biases, 'lr': args.learning_rate_biases}]
+	optimizer = optim.SGD(parameters, lr=args.learning_rate_weights, momentum=args.momentum, weight_decay=args.weight_decay)
 
 	# automatically resume from checkpoint if it exists
 	if (args.save_dir / 'checkpoint.pth').is_file():
@@ -79,12 +88,13 @@ def train(args, model, device='cuda:0'):
 							time=int(time.time() - start_time))
 				print(json.dumps(stats))
 
-			if (step+1) % args.save_freq == 0:
-				state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
-				torch.save(state, args.save_dir / 'checkpoint.pth')
+			# if (step+1) % args.save_freq == 0:
+			# 	state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
+			# 	torch.save(state, args.save_dir / 'checkpoint.pth')
 
-		state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
-		torch.save(state, args.save_dir / ('checkpoint-'+str(epoch)+'.pth'))
+		if (epoch+1) % args.save_freq == 0:
+			state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
+			torch.save(state, args.save_dir / ('checkpoint-'+str(epoch)+'.pth'))
 
 	torch.save(model.backbone.state_dict(), args.save_dir / 'resnet34.pth')
 
@@ -101,17 +111,18 @@ def main():
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr'])
 
 	parser.add_argument('--batch_size', type=int, default=64)
-	parser.add_argument('--buffer_size', type=int, default=63)
+	parser.add_argument('--buffer_size', type=int, default=200)
 
-	parser.add_argument('--epochs', type=int, default=20)
-	parser.add_argument('--learning_rate', type=float, default=0.2)
+	parser.add_argument('--epochs', type=int, default=100)
+	parser.add_argument('--learning_rate_weights', type=float, default=0.2)
+	parser.add_argument('--learning_rate_biases', type=float, default=0.0048)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
 	parser.add_argument('--momentum', default=0.9, type=float)
 
 	parser.add_argument('--seed', type=int, default=10)
 	parser.add_argument('--num_workers', type=int, default=4)
 	parser.add_argument('--print-freq', default=4096, type=int, metavar='N', help='print frequency')
-	parser.add_argument('--save-freq', default=1000000, type=int, metavar='N', help='save frequency')
+	parser.add_argument('--save-freq', default=5, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
 	parser.add_argument('--lambd', default=0.0051, type=float, metavar='L', help='weight on off-diagonal terms')
@@ -126,6 +137,8 @@ def main():
 		os.makedirs(args.save_dir)
 
 	if args.model == 'sliding_bt':
+		args.learning_rate_weights = args.learning_rate_weights * args.batch_size / 256
+		args.learning_rate_biases = args.learning_rate_biases * args.batch_size / 256
 		torch.manual_seed(args.seed)
 		model = BarlowTwins(args)
 	else:
