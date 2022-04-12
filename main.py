@@ -69,7 +69,7 @@ def train(args, model, device='cuda:0'):
 			loss.backward()
 			optimizer.step()
 
-			if step % args.print_freq == 0:
+			if (step+1) % args.print_freq == 0:
 				stats = dict(epoch=epoch,
 							step=step,
 							total=len(train_loader), 
@@ -78,7 +78,7 @@ def train(args, model, device='cuda:0'):
 							time=int(time.time() - start_time))
 				print(json.dumps(stats))
 
-			if step % args.save_freq == 0:
+			if (step+1) % args.save_freq == 0:
 				state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
 				torch.save(state, args.save_dir / 'checkpoint.pth')
 
@@ -99,8 +99,8 @@ def main():
 	parser.add_argument('--model', type=str, default='sliding_bt',
 						choices=['sliding_bt', 'sliding_simclr', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
-	parser.add_argument('--batch_size', type=int, default=64)
-	parser.add_argument('--buffer_size', type=int, default=63)
+	parser.add_argument('--batch_size', type=int, default=4)
+	parser.add_argument('--buffer_size', type=int, default=3)
 
 	parser.add_argument('--epochs', type=int, default=1)
 	parser.add_argument('--learning_rate', type=float, default=0.2)
@@ -109,8 +109,8 @@ def main():
 
 	parser.add_argument('--seed', type=int, default=10)
 	parser.add_argument('--num_workers', type=int, default=4)
-	parser.add_argument('--print-freq', default=1, type=int, metavar='N', help='print frequency')
-	parser.add_argument('--save-freq', default=10000, type=int, metavar='N', help='save frequency')
+	parser.add_argument('--print-freq', default=640, type=int, metavar='N', help='print frequency')
+	parser.add_argument('--save-freq', default=6400, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
 	parser.add_argument('--lambd', default=0.0051, type=float, metavar='L', help='weight on off-diagonal terms')
