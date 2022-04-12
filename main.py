@@ -56,7 +56,7 @@ def train(args, model, device='cuda:0'):
 			y2_inputs = torch.cat([y2, replay_y2], dim=0)
 
 			optimizer.zero_grad()
-			loss = model.forward(y1_inputs, y2_inputs)
+			loss = model(y1_inputs, y2_inputs)
 			loss.backward()
 			optimizer.step()
 
@@ -66,12 +66,12 @@ def train(args, model, device='cuda:0'):
 			else:
 				replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
 
-		if epoch % args.print_freq == 0:
-			stats = dict(epoch=epoch, 
-						 lr=optimizer.param_groups[0]['lr'],
-						 loss=loss.item(),
-						 time=int(time.time() - start_time))
-			print(json.dumps(stats))
+			if step % args.print_freq == 0:
+				stats = dict(epoch=epoch, 
+							 lr=optimizer.param_groups[0]['lr'],
+							 loss=loss.item(),
+							 time=int(time.time() - start_time))
+				print(json.dumps(stats))
 
 		state = dict(epoch=epoch, model=model.state_dict(), optimizer=optimizer.state_dict())
 		torch.save(state, args.save_dir / 'checkpoint.pth')
@@ -91,7 +91,7 @@ def main():
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
 	parser.add_argument('--batch_size', type=int, default=64)
-	parser.add_argument('--buffer_size', type=int, default=200)
+	parser.add_argument('--buffer_size', type=int, default=100)
 
 	parser.add_argument('--epochs', type=int, default=100)
 	parser.add_argument('--learning_rate', type=float, default=0.2)
