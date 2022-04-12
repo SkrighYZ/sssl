@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.random import default_rng
 import random
 import os
 
@@ -25,7 +26,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         self.rehearsal_ixs = rehearsal_ixs  # These are the samples which can be replayed. This list can grow over time.
         self.num_rehearsal_samples = num_rehearsal_samples
 
-        np.random.seed(os.getpid())
+        self.rng = default_rng(seed=os.getpid())
 
     def __iter__(self):
         # We are returning a generator instead of an iterator, because the data points we want to sample from, differs
@@ -35,7 +36,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
         while True:
             print('i', self.rehearsal_ixs)
-            ix = np.random.randint(0, len(self.rehearsal_ixs), self.num_rehearsal_samples)
+            #ix = np.random.randint(0, len(self.rehearsal_ixs), self.num_rehearsal_samples)
+            ix = self.rng.choice(len(self.rehearsal_ixs), self.num_rehearsal_samples, replace=False)
             print(ix)
             yield np.array([self.rehearsal_ixs[_curr_ix] for _curr_ix in ix])
 
