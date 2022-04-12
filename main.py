@@ -99,8 +99,8 @@ def main():
 	parser.add_argument('--model', type=str, default='sliding_bt',
 						choices=['sliding_bt', 'sliding_simclr', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
-	parser.add_argument('--batch_size', type=int, default=128)
-	parser.add_argument('--buffer_size', type=int, default=127)
+	parser.add_argument('--batch_size', type=int, default=64)
+	parser.add_argument('--buffer_size', type=int, default=63)
 
 	parser.add_argument('--epochs', type=int, default=1)
 	parser.add_argument('--learning_rate', type=float, default=0.2)
@@ -109,7 +109,7 @@ def main():
 
 	parser.add_argument('--seed', type=int, default=10)
 	parser.add_argument('--num_workers', type=int, default=4)
-	parser.add_argument('--print-freq', default=1024, type=int, metavar='N', help='print frequency')
+	parser.add_argument('--print-freq', default=512, type=int, metavar='N', help='print frequency')
 	parser.add_argument('--save-freq', default=8192, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
