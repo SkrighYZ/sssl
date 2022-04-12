@@ -106,7 +106,7 @@ def main():
     parser.add_argument('--save_dir', type=Path, metavar='DIR')
 
     args = parser.parse_args()
-    print("Arguments {}".format(json.dumps(vars(args), indent=4, sort_keys=True)))
+    print(args)
 
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
