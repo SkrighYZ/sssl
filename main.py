@@ -51,10 +51,8 @@ def train(args, model, device='cuda:0'):
 			else:
 				replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
 
-			if step+1 % args.batch_size != 0:
+			if (step + 1) % args.batch_size != 0:
 				continue
-
-			print(step)
 
 			y1 = y1.cuda(non_blocking=True)
 			y2 = y2.cuda(non_blocking=True)
