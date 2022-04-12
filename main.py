@@ -36,7 +36,7 @@ def train(args, model, device='cuda:0'):
     start_time = time.time()
     for epoch in range(start_epoch, args.epochs):
 
-        dataset.shuffle(seed=args.seed)
+        dataset.shuffle()
         replay_loader.sampler.rehearsal_ixs = dataset.samples[:batch_size-1]
         replay_iter = iter(replay_loader)
 
@@ -113,6 +113,7 @@ def main():
         os.makedirs(args.save_dir)
 
     if args.model == 'sliding_bt':
+    	torch.manual_seed(args.seed)
         model = BarlowTwins(args)
     else:
         raise NotImplementedError('Model not supported.')

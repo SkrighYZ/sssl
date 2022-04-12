@@ -5,7 +5,7 @@ from PIL import Image
 import torch.utils.data as data
 
 
-def instance_ordering(data_list, seed):
+def instance_ordering(data_list):
     # organize data by video
     total_videos = 0
     new_data_list = []
@@ -20,7 +20,6 @@ def instance_ordering(data_list, seed):
     new_data_list.append(temp_video)
     new_data_list = new_data_list[1:]
     # shuffle videos
-    random.seed(seed)
     random.shuffle(new_data_list)
     # reorganize by clip
     data_list = []
@@ -45,7 +44,6 @@ class Stream51Dataset(data.Dataset):
             in the target and transforms it.
         bbox_crop: crop images to object bounding box (default: True)
         ratio: padding for bbox crop (default: 1.10)
-        seed: random seed for shuffling classes or instances (default=10)
      Attributes:
         samples (list): List of (sample path, class_index) tuples
         targets (list): The class_index value for each image in the dataset
@@ -110,7 +108,7 @@ class Stream51Dataset(data.Dataset):
         fmt_str += '{0}{1}'.format(tmp, self.target_transform.__repr__().replace('\n', '\n' + ' ' * len(tmp)))
         return fmt_str
 
-    def shuffle(seed=10):
+    def shuffle(self):
         """
         data_list
         for train: [class_id, clip_num, video_num, frame_num, bbox, file_loc]
@@ -118,12 +116,11 @@ class Stream51Dataset(data.Dataset):
         """
         if ordering == 'iid':
             # shuffle all data
-            random.seed(seed)
             self.samples = deepcopy.copy(self.data_list)
             random.shuffle(self.samples)
             self.targets = [s[0] for s in self.samples]
         elif ordering == 'instance':
-            self.samples = instance_ordering(self.data_list, seed)
+            self.samples = instance_ordering(self.data_list)
             self.targets = [s[0] for s in self.samples]
         else:
             raise ValueError('dataset ordering must be one of: "iid" or "instance"')
