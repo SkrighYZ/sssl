@@ -36,7 +36,7 @@ def train(args, model, device='cuda:0'):
     start_time = time.time()
     for epoch in range(start_epoch, args.epochs):
 
-    	replay_loader.sampler.rehearsal_ixs = list(range(args.batch_size-1))
+        replay_loader.sampler.rehearsal_ixs = list(range(args.batch_size-1))
         dataset.shuffle()
         replay_iter = iter(replay_loader)
 
