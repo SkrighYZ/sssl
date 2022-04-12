@@ -83,15 +83,11 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--dataset', type=str, default='stream51', choices=['stream51'])
-    parser.add_argument('--images_dir', type=str)
-    parser.add_argument('--save_dir', type=str)
-    parser.add_argument('--expt_name', type=str)
-    parser.add_argument('--order', type=str, choices=['iid', 'instance'])
+    parser.add_argument('--order', type=str, default='isntance', choices=['iid', 'instance'])
     parser.add_argument('--model', type=str, default='sliding_bt',
                         choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'hnm_simclr'])
 
-    parser.add_argument('--num_classes', type=int)
-    parser.add_argument('--batch_size', type=int, default=128)
+    parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--buffer_size', type=int, default=200)
 
     parser.add_argument('--epochs', type=int, default=100)
@@ -103,6 +99,10 @@ def main():
 
     parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
     parser.add_argument('--lambd', default=0.0051, type=float, metavar='L', help='weight on off-diagonal terms')
+
+    parser.add_argument('--images_dir', type=str)
+    parser.add_argument('--save_dir', type=str)
+    parser.add_argument('--expt_name', type=str)
 
     args = parser.parse_args()
     print("Arguments {}".format(json.dumps(vars(args), indent=4, sort_keys=True)))
