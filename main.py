@@ -38,6 +38,7 @@ def train(args, model, device='cuda:0'):
 
         dataset.shuffle()
         replay_loader.sampler.rehearsal_ixs = dataset.samples[:args.batch_size-1]
+        print(replay_loader.sampler.rehearsal_ixs)
         replay_iter = iter(replay_loader)
 
         for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
