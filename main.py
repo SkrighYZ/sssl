@@ -60,9 +60,9 @@ def train(args, model, device='cuda:0'):
 
             # Update sliding window buffer
             if step < args.buffer_size:
-            	replay_loader.sampler.rehearsal_ixs += [len(replay_loader.sampler.rehearsal_ixs)]
+            	replay_loader.sampler.rehearsal_ixs += [step]
             else:
-            	replay_loader.sampler.rehearsal_ixs = replay_loader.sampler.rehearsal_ixs[1:] + [len(replay_loader.sampler.rehearsal_ixs)]
+            	replay_loader.sampler.rehearsal_ixs = replay_loader.sampler.rehearsal_ixs[1:] + [step]
 
             if step % args.print_freq == 0:
                 stats = dict(epoch=epoch, step=step,
