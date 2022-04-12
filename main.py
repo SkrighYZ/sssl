@@ -12,7 +12,7 @@ import torch
 
 from models import BarlowTwins
 
-from loading_utils import get_stream_data_loader
+from loading_utils import get_stream_data_loaders
 
 
 def train(args, model, device='cuda:0'):
