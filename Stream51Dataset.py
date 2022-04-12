@@ -114,12 +114,12 @@ class Stream51Dataset(data.Dataset):
         for train: [class_id, clip_num, video_num, frame_num, bbox, file_loc]
         for test: [class_id, bbox, file_loc]
         """
-        if ordering == 'iid':
+        if self.ordering == 'iid':
             # shuffle all data
             self.samples = deepcopy.copy(self.data_list)
             random.shuffle(self.samples)
             self.targets = [s[0] for s in self.samples]
-        elif ordering == 'instance':
+        elif self.ordering == 'instance':
             self.samples = instance_ordering(self.data_list)
             self.targets = [s[0] for s in self.samples]
         else:
