@@ -37,7 +37,6 @@ def train(args, model, device='cuda:0'):
 	for epoch in range(start_epoch, args.epochs):
 
 		dataset.shuffle()
-		#replay_loader.sampler.rehearsal_ixs = list(range(args.batch_size-1))
 		replay_sampler.rehearsal_ixs = list(range(args.batch_size-1))
 		replay_iter = iter(replay_loader)
 
@@ -64,9 +63,9 @@ def train(args, model, device='cuda:0'):
 
 			# Update sliding window buffer
 			if step < args.buffer_size:
-				replay_loader.sampler.rehearsal_ixs += [step]
+				replay_sampler.rehearsal_ixs += [step]
 			else:
-				replay_loader.sampler.rehearsal_ixs = replay_loader.sampler.rehearsal_ixs[1:] + [step]
+				replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
 
 			if step % args.print_freq == 0:
 				stats = dict(epoch=epoch, step=step,
