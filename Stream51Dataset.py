@@ -52,15 +52,13 @@ class Stream51Dataset(data.Dataset):
 
     def __init__(self, root, ordering=None, transform=None, bbox_crop=True, ratio=1.10):
 
-        self.data_list = json.load(open(os.path.join(root, 'Stream-51_meta_train.json')))
+        self.samples = json.load(open(os.path.join(root, 'Stream-51_meta_train.json')))
+        self.targets = [s[0] for s in self.samples]
 
         self.ordering = ordering
 
         self.root = root
         self.loader = default_loader
-
-        self.samples = None
-        self.targets = None
 
         self.transform = transform
 
@@ -117,11 +115,10 @@ class Stream51Dataset(data.Dataset):
         """
         if self.ordering == 'iid':
             # shuffle all data
-            self.samples = copy.deepcopy(self.data_list)
             random.shuffle(self.samples)
             self.targets = [s[0] for s in self.samples]
         elif self.ordering == 'instance':
-            self.samples = instance_ordering(self.data_list)
+            self.samples = instance_ordering(self.samples)
             self.targets = [s[0] for s in self.samples]
         else:
             raise ValueError('dataset ordering must be one of: "iid" or "instance"')
