@@ -15,7 +15,7 @@ from models import BarlowTwins
 
 from loading_utils import get_stream_data_loaders
 
-def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs=1):
+def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs):
 	max_steps = args.epochs * len(loader)
 	warmup_steps = warmup_epochs * len(loader)
 	base_lr = 1
@@ -25,7 +25,8 @@ def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs=1):
 		step -= warmup_steps
 		max_steps -= warmup_steps
 		q = 0.5 * (1 + math.cos(math.pi * step / max_steps))
-		end_lr = base_lr * 0.001
+		#end_lr = base_lr * 0.001
+		end_lr = base_lr * 0.01
 		lr = base_lr * q + end_lr * (1 - q)
 	optimizer.param_groups[0]['lr'] = lr * args.learning_rate_weights
 	optimizer.param_groups[1]['lr'] = lr * args.learning_rate_biases
@@ -88,7 +89,7 @@ def train(args, model, device='cuda:0'):
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
 
-			adjust_learning_rate(args, optimizer, train_loader, step)
+			adjust_learning_rate(args, optimizer, train_loader, step, warmup_epochs=2)
 			optimizer.zero_grad()
 			loss = model(y1_inputs, y2_inputs)
 			loss.backward()
@@ -137,7 +138,7 @@ def main():
 	parser.add_argument('--seed', type=int, default=10)
 	parser.add_argument('--num_workers', type=int, default=4)
 	parser.add_argument('--print-freq', default=1000, type=int, metavar='N', help='print frequency')
-	parser.add_argument('--save-freq', default=5, type=int, metavar='N', help='save frequency')
+	parser.add_argument('--save-freq', default=2, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
 	parser.add_argument('--lambd', default=0.005, type=float, metavar='L', help='weight on off-diagonal terms')
