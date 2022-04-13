@@ -15,7 +15,7 @@ from models import BarlowTwins
 
 from loading_utils import get_stream_data_loaders
 
-def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs=5):
+def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs=1):
 	max_steps = args.epochs * len(loader)
 	warmup_steps = warmup_epochs * len(loader)
 	base_lr = 1
@@ -54,12 +54,12 @@ def train(args, model, device='cuda:0'):
 	else:
 		start_epoch = 0
 
-	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args, shuffle=False)
+	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args, shuffle=True)
 
 	start_time = time.time()
 	for epoch in range(start_epoch, args.epochs):
 
-		dataset.shuffle()
+		#dataset.shuffle()
 		if replay_sampler:
 			replay_sampler.rehearsal_ixs = list(range(args.batch_size-1))
 			replay_iter = iter(replay_loader)
@@ -128,7 +128,7 @@ def main():
 	parser.add_argument('--batch_size', type=int, default=64)
 	parser.add_argument('--buffer_size', type=int, default=200)
 
-	parser.add_argument('--epochs', type=int, default=100)
+	parser.add_argument('--epochs', type=int, default=10)
 	parser.add_argument('--learning_rate_weights', type=float, default=0.2)
 	parser.add_argument('--learning_rate_biases', type=float, default=0.005)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
