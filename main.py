@@ -57,6 +57,7 @@ def train(args, model, device='cuda:0'):
 
 	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args, shuffle=True)
 
+	model.train()
 	start_time = time.time()
 	for epoch in range(start_epoch, args.epochs):
 
@@ -127,7 +128,7 @@ def main():
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr'])
 
 	parser.add_argument('--batch_size', type=int, default=256)
-	parser.add_argument('--buffer_size', type=int, default=200)
+	parser.add_argument('--buffer_size', type=int, default=256)
 
 	parser.add_argument('--epochs', type=int, default=50)
 	parser.add_argument('--warmup_epochs', type=int, default=5)
