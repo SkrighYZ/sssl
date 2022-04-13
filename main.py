@@ -15,6 +15,20 @@ from models import BarlowTwins
 
 from loading_utils import get_stream_data_loaders
 
+def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs=5):
+	max_steps = args.epochs * len(loader)
+	warmup_steps = warmup_epochs * len(loader)
+	base_lr = 1
+	if step < warmup_steps:
+		lr = step / warmup_steps
+	else:
+		step -= warmup_steps
+		max_steps -= warmup_steps
+		q = 0.5 * (1 + math.cos(math.pi * step / max_steps))
+		end_lr = base_lr * 0.001
+		lr = base_lr * q + end_lr * (1 - q)
+	optimizer.param_groups[0]['lr'] = lr * args.learning_rate_weights
+	optimizer.param_groups[1]['lr'] = lr * args.learning_rate_biases
 
 def train(args, model, device='cuda:0'):
 
@@ -74,6 +88,7 @@ def train(args, model, device='cuda:0'):
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
 
+			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
 			loss = model(y1_inputs, y2_inputs)
 			loss.backward()
@@ -115,17 +130,17 @@ def main():
 
 	parser.add_argument('--epochs', type=int, default=100)
 	parser.add_argument('--learning_rate_weights', type=float, default=0.2)
-	parser.add_argument('--learning_rate_biases', type=float, default=0.0048)
+	parser.add_argument('--learning_rate_biases', type=float, default=0.005)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
 	parser.add_argument('--momentum', default=0.9, type=float)
 
 	parser.add_argument('--seed', type=int, default=10)
 	parser.add_argument('--num_workers', type=int, default=4)
-	parser.add_argument('--print-freq', default=4096, type=int, metavar='N', help='print frequency')
+	parser.add_argument('--print-freq', default=1000, type=int, metavar='N', help='print frequency')
 	parser.add_argument('--save-freq', default=5, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
-	parser.add_argument('--lambd', default=0.0051, type=float, metavar='L', help='weight on off-diagonal terms')
+	parser.add_argument('--lambd', default=0.005, type=float, metavar='L', help='weight on off-diagonal terms')
 
 	parser.add_argument('--images_dir', type=Path, metavar='DIR', default='../data/Stream-51')
 	parser.add_argument('--save_dir', type=Path, metavar='DIR')
@@ -137,8 +152,8 @@ def main():
 		os.makedirs(args.save_dir)
 
 	if args.model == 'sliding_bt':
-		args.learning_rate_weights = args.learning_rate_weights * args.batch_size / 256
-		args.learning_rate_biases = args.learning_rate_biases * args.batch_size / 256
+		#args.learning_rate_weights = args.learning_rate_weights * args.batch_size / 256
+		#args.learning_rate_biases = args.learning_rate_biases * args.batch_size / 256
 		torch.manual_seed(args.seed)
 		model = BarlowTwins(args)
 	else:
