@@ -11,7 +11,7 @@ from pathlib import Path
 from torch import optim, nn
 import torch
 
-from models import BarlowTwins
+from models import BarlowTwins, SimCLR
 
 from loading_utils import get_stream_data_loaders
 
