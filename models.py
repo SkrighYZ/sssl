@@ -14,7 +14,9 @@ class BarlowTwins(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.backbone = torchvision.models.resnet34(zero_init_residual=True)
+        self.backbone = torchvision.models.resnet18(zero_init_residual=True)
+        self.backbone.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.backbone.maxpool = nn.Sequential()
         self.backbone.fc = nn.Identity()
 
         # projector
@@ -94,7 +96,9 @@ class SimCLR(nn.Module):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.backbone = torchvision.models.resnet34(zero_init_residual=True)
+        self.backbone = torchvision.models.resnet18(zero_init_residual=True)
+        self.backbone.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.backbone.maxpool = nn.Sequential()
         self.backbone.fc = nn.Identity()
 
         self.criterion = NT_Xent(args.batch_size, temperature=0.5)

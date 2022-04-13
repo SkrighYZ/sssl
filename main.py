@@ -15,9 +15,9 @@ from models import BarlowTwins, SimCLR
 
 from loading_utils import get_stream_data_loaders
 
-def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs):
+def adjust_learning_rate(args, optimizer, loader, step):
 	max_steps = args.epochs * len(loader)
-	warmup_steps = warmup_epochs * len(loader)
+	warmup_steps = args.warmup_epochs * len(loader)
 	base_lr = 1
 	if step < warmup_steps:
 		lr = step / warmup_steps
@@ -26,7 +26,7 @@ def adjust_learning_rate(args, optimizer, loader, step, warmup_epochs):
 		max_steps -= warmup_steps
 		q = 0.5 * (1 + math.cos(math.pi * step / max_steps))
 		#end_lr = base_lr * 0.001
-		end_lr = base_lr * 0.01
+		end_lr = base_lr * 0.1
 		lr = base_lr * q + end_lr * (1 - q)
 	optimizer.param_groups[0]['lr'] = lr * args.learning_rate_weights
 	optimizer.param_groups[1]['lr'] = lr * args.learning_rate_biases
@@ -89,7 +89,7 @@ def train(args, model, device='cuda:0'):
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
 
-			adjust_learning_rate(args, optimizer, train_loader, step, warmup_epochs=2)
+			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
 			loss = model(y1_inputs, y2_inputs)
 			loss.backward()
@@ -112,7 +112,7 @@ def train(args, model, device='cuda:0'):
 			state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
 			torch.save(state, args.save_dir / ('checkpoint-'+str(epoch)+'.pth'))
 
-	torch.save(model.backbone.state_dict(), args.save_dir / 'resnet34.pth')
+	torch.save(model.backbone.state_dict(), args.save_dir / 'resnet18.pth')
 
 	return model
 
@@ -126,10 +126,11 @@ def main():
 	parser.add_argument('--model', type=str, default='sliding_bt',
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr'])
 
-	parser.add_argument('--batch_size', type=int, default=64)
+	parser.add_argument('--batch_size', type=int, default=128)
 	parser.add_argument('--buffer_size', type=int, default=200)
 
-	parser.add_argument('--epochs', type=int, default=10)
+	parser.add_argument('--epochs', type=int, default=50)
+	parser.add_argument('--warmup_epochs', type=int, default=5)
 	parser.add_argument('--learning_rate_weights', type=float, default=0.2)
 	parser.add_argument('--learning_rate_biases', type=float, default=0.005)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
