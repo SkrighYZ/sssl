@@ -69,9 +69,9 @@ def train(args, model, device='cuda:0'):
 
 		for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
 
-			pickle.dump(y1, open('../y1.pkl', 'wb'))
-			pickle.dump(y2, open('../y2.pkl', 'wb'))
-			break
+			# pickle.dump(y1, open('../y1.pkl', 'wb'))
+			# pickle.dump(y2, open('../y2.pkl', 'wb'))
+			# break
 			
 			if replay_sampler:
 
