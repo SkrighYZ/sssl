@@ -108,7 +108,7 @@ def train(args, model, device='cuda:0'):
 			if (step+1) % args.print_freq == 0:
 				stats = dict(epoch=epoch,
 							step=step,
-							len=len(train_loader), 
+							total=args.epochs*len(train_loader), 
 							lr=optimizer.param_groups[0]['lr'],
 							loss=loss.item(),
 							time=int(time.time() - start_time))
