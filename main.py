@@ -7,6 +7,7 @@ import math
 import random
 import sys
 from pathlib import Path
+import pickle
 
 from torch import optim, nn
 import torch
@@ -67,6 +68,10 @@ def train(args, model, device='cuda:0'):
 			replay_iter = iter(replay_loader)
 
 		for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
+
+			pickle.save(y1, open('../y1.pkl', 'wb'))
+			pickle.save(y2, open('../y1.pkl', 'wb'))
+			break
 			
 			if replay_sampler:
 
@@ -127,10 +132,10 @@ def main():
 	parser.add_argument('--model', type=str, default='sliding_bt',
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr'])
 
-	parser.add_argument('--batch_size', type=int, default=256)
+	parser.add_argument('--batch_size', type=int, default=4)
 	parser.add_argument('--buffer_size', type=int, default=256)
 
-	parser.add_argument('--epochs', type=int, default=50)
+	parser.add_argument('--epochs', type=int, default=1)
 	parser.add_argument('--warmup_epochs', type=int, default=5)
 	parser.add_argument('--learning_rate_weights', type=float, default=0.2)
 	parser.add_argument('--learning_rate_biases', type=float, default=0.005)
