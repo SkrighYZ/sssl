@@ -56,7 +56,7 @@ def train(args, model, device='cuda:0'):
 	else:
 		start_epoch = 0
 
-	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args, shuffle=True)
+	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args, shuffle=False)
 
 	model.train()
 	start_time = time.time()
