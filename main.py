@@ -124,7 +124,7 @@ def train(args, model, device='cuda:0'):
 
 		stats = dict(epoch=epoch,
 				lr=optimizer.param_groups[0]['lr'],
-				loss=loss_total/len(train_loader),
+				avg_loss=loss_total/len(train_loader),
 				time=int(time.time() - start_time))
 		loss_total = 0
 		print(json.dumps(stats))
@@ -147,8 +147,8 @@ def main():
 	parser.add_argument('--batch_size', type=int, default=256)
 	parser.add_argument('--buffer_size', type=int, default=256)
 
-	parser.add_argument('--epochs', type=int, default=50)
-	parser.add_argument('--warmup_epochs', type=int, default=5)
+	parser.add_argument('--epochs', type=int, default=20)
+	parser.add_argument('--warmup_epochs', type=int, default=2)
 	parser.add_argument('--learning_rate_weights', type=float, default=0.2)
 	parser.add_argument('--learning_rate_biases', type=float, default=0.005)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
@@ -156,7 +156,7 @@ def main():
 
 	parser.add_argument('--num_workers', type=int, default=4)
 	parser.add_argument('--print_freq', default=200, type=int, metavar='N', help='print frequency')
-	parser.add_argument('--save_freq', default=10, type=int, metavar='N', help='save frequency')
+	parser.add_argument('--save_freq', default=5, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
 	parser.add_argument('--lambd', default=0.005, type=float, metavar='L', help='weight on off-diagonal terms')
