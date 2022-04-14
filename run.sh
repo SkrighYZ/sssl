@@ -4,7 +4,7 @@
 python main.py \
 	--order iid \
 	--model sliding_bt \
-	--batch_size 128 \
+	--batch_size 256 \
 	--buffer_size 256 \
 	--epochs 10 \
 	--warmup_epochs 1 \
