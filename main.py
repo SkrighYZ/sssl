@@ -67,6 +67,8 @@ def train(args, model, device='cuda:0'):
 			replay_sampler.rehearsal_ixs = list(range(args.batch_size-1))
 			replay_iter = iter(replay_loader)
 
+		loss_total = 0
+
 		for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
 
 			# pickle.dump(y1, open('../y1.pkl', 'wb'))
@@ -101,10 +103,12 @@ def train(args, model, device='cuda:0'):
 			loss.backward()
 			optimizer.step()
 
+			loss_total += loss.item()
+
 			if (step+1) % args.print_freq == 0:
 				stats = dict(epoch=epoch,
 							step=step,
-							total=len(train_loader), 
+							len=len(train_loader), 
 							lr=optimizer.param_groups[0]['lr'],
 							loss=loss.item(),
 							time=int(time.time() - start_time))
@@ -117,6 +121,14 @@ def train(args, model, device='cuda:0'):
 		if (epoch+1) % args.save_freq == 0:
 			state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
 			torch.save(state, args.save_dir / ('checkpoint-'+str(epoch)+'.pth'))
+
+		stats = dict(epoch=epoch,
+				lr=optimizer.param_groups[0]['lr'],
+				loss=loss_total/len(train_loader),
+				time=int(time.time() - start_time))
+		loss_total = 0
+		print(json.dumps(stats))
+		print('-----------------')
 
 	torch.save(model.backbone.state_dict(), args.save_dir / 'resnet18.pth')
 
