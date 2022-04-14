@@ -48,8 +48,8 @@ def train(args, model, device='cuda:0'):
 	optimizer = optim.SGD(parameters, lr=args.learning_rate_weights, momentum=args.momentum, weight_decay=args.weight_decay)
 
 	# automatically resume from checkpoint if it exists
-	if (args.save_dir / 'checkpoint.pth').is_file():
-		ckpt = torch.load(args.save_dir / 'checkpoint.pth', map_location='cpu')
+	if (args.save_dir / 'checkpoint-4.pth').is_file():
+		ckpt = torch.load(args.save_dir / 'checkpoint-4.pth', map_location='cpu')
 		start_epoch = ckpt['epoch']
 		model.load_state_dict(ckpt['model'])
 		optimizer.load_state_dict(ckpt['optimizer'])
