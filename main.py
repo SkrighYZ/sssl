@@ -27,7 +27,7 @@ def adjust_learning_rate(args, optimizer, loader, step):
 		max_steps -= warmup_steps
 		q = 0.5 * (1 + math.cos(math.pi * step / max_steps))
 		#end_lr = base_lr * 0.001
-		end_lr = base_lr * 0.1
+		end_lr = base_lr * args.lr_decay
 		lr = base_lr * q + end_lr * (1 - q)
 	optimizer.param_groups[0]['lr'] = lr * args.learning_rate_weights
 	optimizer.param_groups[1]['lr'] = lr * args.learning_rate_biases
@@ -62,7 +62,7 @@ def train(args, model, device='cuda:0'):
 	start_time = time.time()
 	for epoch in range(start_epoch, args.epochs):
 
-		#dataset.shuffle()
+		dataset.shuffle()
 		if replay_sampler:
 			replay_sampler.rehearsal_ixs = list(range(args.batch_size-1))
 			replay_iter = iter(replay_loader)
@@ -114,10 +114,6 @@ def train(args, model, device='cuda:0'):
 							time=int(time.time() - start_time))
 				print(json.dumps(stats))
 
-			# if (step+1) % args.save_freq == 0:
-			# 	state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
-			# 	torch.save(state, args.save_dir / 'checkpoint.pth')
-
 		if (epoch+1) % args.save_freq == 0:
 			state = dict(epoch=epoch, step=step, model=model.state_dict(), optimizer=optimizer.state_dict())
 			torch.save(state, args.save_dir / ('checkpoint-'+str(epoch)+'.pth'))
@@ -147,10 +143,11 @@ def main():
 	parser.add_argument('--batch_size', type=int, default=128)
 	parser.add_argument('--buffer_size', type=int, default=256)
 
-	parser.add_argument('--epochs', type=int, default=20)
-	parser.add_argument('--warmup_epochs', type=int, default=2)
+	parser.add_argument('--epochs', type=int, default=5)
+	parser.add_argument('--warmup_epochs', type=int, default=1)
 	parser.add_argument('--learning_rate_weights', type=float, default=0.3)
 	parser.add_argument('--learning_rate_biases', type=float, default=0.005)
+	parser.add_argument('--lr_decay', type=float, default=1)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
 	parser.add_argument('--momentum', default=0.9, type=float)
 
@@ -171,8 +168,6 @@ def main():
 		os.makedirs(args.save_dir)
 
 	if args.model == 'sliding_bt':
-		#args.learning_rate_weights = args.learning_rate_weights * args.batch_size / 256
-		#args.learning_rate_biases = args.learning_rate_biases * args.batch_size / 256
 		model = BarlowTwins(args)
 	else:
 		raise NotImplementedError('Model not supported.')
