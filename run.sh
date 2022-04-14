@@ -9,6 +9,6 @@ python main.py \
 	--learning_rate_weights 0.2 \
 	--learning_rate_biases 0.005 \
 	--print_freq 200 \
-	--save-freq 10 \
+	--save_freq 10 \
 	--projector 2048-2048 \
 	--save_dir ../models/sliding_bt
