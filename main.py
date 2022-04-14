@@ -144,18 +144,18 @@ def main():
 	parser.add_argument('--model', type=str, default='sliding_bt',
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr'])
 
-	parser.add_argument('--batch_size', type=int, default=256)
+	parser.add_argument('--batch_size', type=int, default=128)
 	parser.add_argument('--buffer_size', type=int, default=256)
 
 	parser.add_argument('--epochs', type=int, default=20)
 	parser.add_argument('--warmup_epochs', type=int, default=2)
-	parser.add_argument('--learning_rate_weights', type=float, default=0.2)
+	parser.add_argument('--learning_rate_weights', type=float, default=0.3)
 	parser.add_argument('--learning_rate_biases', type=float, default=0.005)
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
 	parser.add_argument('--momentum', default=0.9, type=float)
 
 	parser.add_argument('--num_workers', type=int, default=4)
-	parser.add_argument('--print_freq', default=200, type=int, metavar='N', help='print frequency')
+	parser.add_argument('--print_freq', default=400, type=int, metavar='N', help='print frequency')
 	parser.add_argument('--save_freq', default=5, type=int, metavar='N', help='save frequency')
 
 	parser.add_argument('--projector', default='2048-2048', type=str, metavar='MLP', help='projector MLP')
