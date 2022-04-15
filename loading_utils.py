@@ -71,7 +71,7 @@ def get_test_data_loaders(args):
 
     if args.dataset == 'stream51':
         transform = transforms.Compose([
-                transforms.Resize(64, interpolation=Image.BICUBIC)
+                transforms.Resize(64, interpolation=Image.BICUBIC),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                     std=[0.229, 0.224, 0.225])
