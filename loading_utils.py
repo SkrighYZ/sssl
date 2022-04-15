@@ -120,9 +120,8 @@ class Transform:
             ])
 
     def __call__(self, x):
-        y1 = self.transform(x)
-        y2 = y1
-        return y1, y2
+        y = self.transform(x)
+        return y
 
 class SSLTransform:
     def __init__(self):

@@ -65,11 +65,14 @@ def train(args, model, device='cuda:0'):
 
 		loss_total = 0
 
-		for step, ((y1, y2), labels) in enumerate(train_loader, start=epoch*len(train_loader)):
+		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 
 			# pickle.dump(y1, open('../y1.pkl', 'wb'))
 			# pickle.dump(y2, open('../y2.pkl', 'wb'))
 			# break
+
+			if not args.model == 'sliding_supervised':
+				y1, y2 = y
 			
 			if replay_sampler:
 
@@ -87,8 +90,11 @@ def train(args, model, device='cuda:0'):
 
 				(replay_y1, replay_y2), _ = next(replay_iter)
 				y1_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y1.cuda(non_blocking=True)], dim=0)
-				y2_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y2.cuda(non_blocking=True)], dim=0)
+				y2_inputs = torch.cat([y2.cuda(non_blocking=True), replay_y2.cuda(non_blocking=True)], dim=0)
 
+			elif args.model == 'sliding_supervised':
+				y_inputs = y.cuda(non_blocking=True)
+				targets = labels.cuda(non_blocking=True)
 			else:
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
@@ -97,7 +103,7 @@ def train(args, model, device='cuda:0'):
 			optimizer.zero_grad()
 
 			if args.model == 'sliding_supervised':
-				loss = criterion(model(y1_inputs), labels.cuda(non_blocking=True))
+				loss = criterion(model(y), targets)
 			else:
 				loss = model(y1_inputs, y2_inputs)
 
