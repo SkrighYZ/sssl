@@ -2,6 +2,7 @@
 
 
 python main.py \
+	--mode train \
 	--order iid \
 	--model sliding_supervised \
 	--batch_size 256 \
