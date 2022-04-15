@@ -49,7 +49,7 @@ def train(args, model, device='cuda:0'):
 
 	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args)
 
-	if args.model == 'supervised':
+	if args.model == 'sliding_supervised':
 		criterion = nn.CrossEntropyLoss().to(device)
 
 	model.train()
@@ -96,7 +96,7 @@ def train(args, model, device='cuda:0'):
 			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
 
-			if args.model == 'supervised':
+			if args.model == 'sliding_supervised':
 				loss = criterion(model(y1), labels.to(device))
 			else:
 				loss = model(y1_inputs, y2_inputs)
@@ -171,7 +171,7 @@ def main():
 
 	if args.model == 'sliding_bt':
 		model = BarlowTwins(args)
-	elif args.model == 'supervised':
+	elif args.model == 'sliding_supervised':
 		model = ResNet18(args)
 	else:
 		raise NotImplementedError('Model not supported.')

@@ -47,7 +47,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 def get_stream_data_loaders(args):
 
     if args.dataset == 'stream51':
-        if args.model == 'supervised':
+        if args.model == 'sliding_supervised':
             dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=Transform(), bbox_crop=True, ratio=1.10)
         else:
             dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=SSLTransform(), bbox_crop=True, ratio=1.10)
