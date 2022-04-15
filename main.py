@@ -97,7 +97,7 @@ def train(args, model, device='cuda:0'):
 			optimizer.zero_grad()
 
 			if args.model == 'sliding_supervised':
-				loss = criterion(model(y1), labels.to(device))
+				loss = criterion(model(y1), labels.cuda(non_blocking=True))
 			else:
 				loss = model(y1_inputs, y2_inputs)
 
