@@ -3,7 +3,7 @@
 
 python main.py \
 	--order iid \
-	--model supervised \
+	--model sliding_supervised \
 	--batch_size 256 \
 	--buffer_size 256 \
 	--epochs 10 \
