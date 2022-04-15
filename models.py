@@ -124,3 +124,16 @@ class SimCLR(nn.Module):
 
         loss = criterion(z1, z2)
         return loss
+
+class ResNet18(nn.Module):
+    def __init__(self, args):
+        super().__init__()
+        self.args = args
+        self.backbone = torchvision.models.resnet18()
+        self.backbone.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
+        self.backbone.maxpool = nn.Sequential()
+        self.backbone.fc = nn.Linear(512, args.num_classes)
+
+    def forward(self, y):
+        out = self.backbone(y)
+        return out

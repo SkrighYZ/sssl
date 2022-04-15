@@ -47,7 +47,10 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 def get_stream_data_loaders(args):
 
     if args.dataset == 'stream51':
-        dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=Transform(), bbox_crop=True, ratio=1.10)
+        if args.model == 'supervised':
+            dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=Transform(), bbox_crop=True, ratio=1.10)
+        else:
+            dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=SSLTransform(), bbox_crop=True, ratio=1.10)
     else:
         raise NotImplementedError
 
@@ -88,8 +91,22 @@ class Solarization(object):
         else:
             return img
 
-
 class Transform:
+    def __init__(self):
+        self.transform = transforms.Compose([
+                transforms.Resize((64, 64), interpolation=Image.BICUBIC),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                    std=[0.229, 0.224, 0.225])
+            ])
+
+    def __call__(self, x):
+        y1 = self.transform(x)
+        y2 = y1
+        return y1, y2
+
+class SSLTransform:
     def __init__(self):
         self.transform = transforms.Compose([
             transforms.RandomResizedCrop(64, scale=(0.5, 1), interpolation=Image.BICUBIC),

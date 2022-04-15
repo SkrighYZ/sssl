@@ -12,7 +12,7 @@ import pickle
 from torch import optim, nn
 import torch
 
-from models import BarlowTwins, SimCLR
+from models import BarlowTwins, SimCLR, ResNet18
 
 from loading_utils import get_stream_data_loaders
 
@@ -47,19 +47,15 @@ def train(args, model, device='cuda:0'):
 				{'params': param_biases, 'lr': args.learning_rate_biases}]
 	optimizer = optim.SGD(parameters, lr=args.learning_rate_weights, momentum=args.momentum, weight_decay=args.weight_decay)
 
-	# automatically resume from checkpoint if it exists
-	if (args.save_dir / 'checkpoint-4.pth').is_file():
-		ckpt = torch.load(args.save_dir / 'checkpoint-4.pth', map_location='cpu')
-		start_epoch = ckpt['epoch']
-		model.load_state_dict(ckpt['model'])
-		optimizer.load_state_dict(ckpt['optimizer'])
-	else:
-		start_epoch = 0
-
 	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args)
+
+	if args.model == 'supervised':
+		criterion = nn.CrossEntropyLoss().to(device)
 
 	model.train()
 	start_time = time.time()
+	start_epoch = 0
+	
 	for epoch in range(start_epoch, args.epochs):
 
 		dataset.shuffle()
@@ -69,7 +65,7 @@ def train(args, model, device='cuda:0'):
 
 		loss_total = 0
 
-		for step, ((y1, y2), _) in enumerate(train_loader, start=epoch*len(train_loader)):
+		for step, ((y1, y2), labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 
 			# pickle.dump(y1, open('../y1.pkl', 'wb'))
 			# pickle.dump(y2, open('../y2.pkl', 'wb'))
@@ -99,7 +95,12 @@ def train(args, model, device='cuda:0'):
 
 			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
-			loss = model(y1_inputs, y2_inputs)
+
+			if args.model == 'supervised':
+				loss = criterion(model(y1), labels.to(device))
+			else:
+				loss = model(y1_inputs, y2_inputs)
+
 			loss.backward()
 			optimizer.step()
 
@@ -136,9 +137,10 @@ def main():
 	parser = argparse.ArgumentParser()
 
 	parser.add_argument('--dataset', type=str, default='stream51', choices=['stream51'])
+	parser.add_argument('--num_classes', type=int, default=51)
 	parser.add_argument('--order', type=str, default='iid', choices=['iid', 'instance'])
 	parser.add_argument('--model', type=str, default='sliding_bt',
-						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr'])
+						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr', 'supervised'])
 
 	parser.add_argument('--batch_size', type=int, default=128)
 	parser.add_argument('--buffer_size', type=int, default=256)
@@ -169,6 +171,8 @@ def main():
 
 	if args.model == 'sliding_bt':
 		model = BarlowTwins(args)
+	elif args.model == 'supervised':
+		model = ResNet18(args)
 	else:
 		raise NotImplementedError('Model not supported.')
 
