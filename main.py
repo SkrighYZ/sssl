@@ -93,7 +93,7 @@ def train(args, model, device='cuda:0'):
 				y2_inputs = torch.cat([y2.cuda(non_blocking=True), replay_y2.cuda(non_blocking=True)], dim=0)
 
 			elif args.model == 'sliding_supervised':
-				y_inputs = y.cuda(non_blocking=True)
+				inputs = y.cuda(non_blocking=True)
 				targets = labels.cuda(non_blocking=True)
 			else:
 				y1_inputs = y1.cuda(non_blocking=True)
@@ -103,7 +103,7 @@ def train(args, model, device='cuda:0'):
 			optimizer.zero_grad()
 
 			if args.model == 'sliding_supervised':
-				loss = criterion(model(y), targets)
+				loss = criterion(model(inputs), targets)
 			else:
 				loss = model(y1_inputs, y2_inputs)
 
