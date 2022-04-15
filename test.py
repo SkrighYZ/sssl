@@ -136,8 +136,6 @@ def train(args, model, device='cuda:0'):
 def main():
 	parser = argparse.ArgumentParser()
 
-	parser.add_argument('--mode', type=str, choices=['train', 'test'])
-
 	parser.add_argument('--dataset', type=str, default='stream51', choices=['stream51'])
 	parser.add_argument('--num_classes', type=int, default=51)
 	parser.add_argument('--order', type=str, default='iid', choices=['iid', 'instance'])
@@ -178,10 +176,8 @@ def main():
 	else:
 		raise NotImplementedError('Model not supported.')
 
-	if args.mode == 'train':
-		train(args, model)
-	else:
-		pass
+	# perform streaming classification
+	train(args, model)
 
 
 if __name__ == '__main__':
