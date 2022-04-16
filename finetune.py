@@ -20,29 +20,29 @@ from loading_utils import get_finetune_dataloaders
 def prepare_model(args):
 	model = torchvision.models.resnet18(pretrained=False)
 	model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
-    model.maxpool = nn.Sequential()
+	model.maxpool = nn.Sequential()
 
-    if 'bt' in args.ckpt_dir:
-    	model.fc = nn.Identity()
-    	ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
-    	model.load_state_dict(ckpt)
-    elif 'sup' in args.ckpt_dir:
-    	model.fc = nn.Linear(512, args.pretrained_num_classes)
-    	ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
-    	model.load_state_dict(ckpt)
-    else:
-    	raise NotImplementedError('Model not supported.')
+	if 'bt' in args.ckpt_dir:
+		model.fc = nn.Identity()
+		ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
+		model.load_state_dict(ckpt)
+	elif 'sup' in args.ckpt_dir:
+		model.fc = nn.Linear(512, args.pretrained_num_classes)
+		ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
+		model.load_state_dict(ckpt)
+	else:
+		raise NotImplementedError('Model not supported.')
 
-    model.fc = nn.Linear(512, args.num_classes)
+	model.fc = nn.Linear(512, args.num_classes)
 
-    params_to_learn = []
-    for name, param in model.named_parameters():
-        if name == 'fc':
-            params_to_learn.append(param)
-        else:
-        	param.requires_grad = False
+	params_to_learn = []
+	for name, param in model.named_parameters():
+		if name == 'fc':
+			params_to_learn.append(param)
+		else:
+			param.requires_grad = False
 
-    return model, params_to_learn
+	return model, params_to_learn
 
 
 def train(args, model, params_to_learn, device='cuda:0'):
@@ -91,7 +91,7 @@ def train(args, model, params_to_learn, device='cuda:0'):
 			training_logs['acc'].append(acc)
 
 		with open(args.ckpt_dir / 'finetune_logs.json', 'w') as f:
-    		json.dump(training_logs, f, indent=4)
+			json.dump(training_logs, f, indent=4)
 
 	torch.save(model.state_dict(), args.ckpt_dir / 'linear_'+args.dataset+'.pth')
 
@@ -102,16 +102,16 @@ def eval(args, model, test_loader):
 	model.eval()
 	correct = 0
 	with torch.no_grad():
-        for data, labels in test_loader:
-        	inputs = data.cuda(non_blocking=True)
+		for data, labels in test_loader:
+			inputs = data.cuda(non_blocking=True)
 			targets = labels.cuda(non_blocking=True)
-            preds = model(inputs)
-            correct += (preds.argmax(1) == targets).type(torch.float).sum().item()
+			preds = model(inputs)
+			correct += (preds.argmax(1) == targets).type(torch.float).sum().item()
 
-    acc = correct / len(dataloader.dataset)
-    print('Testing Accuracy: {}'.format(acc))
+	acc = correct / len(dataloader.dataset)
+	print('Testing Accuracy: {}'.format(acc))
 
-    return acc
+	return acc
 
 
 
