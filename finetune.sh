@@ -9,4 +9,4 @@ python finetune.py \
 	--decay_epochs 40 80 \
 	--weight_decay 1e-4 \
 	--eval_freq 10 \
-	--ckpt_dir ../models/iid_sup
+	--ckpt_dir ../models/instance_sup
