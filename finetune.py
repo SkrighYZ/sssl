@@ -37,8 +37,7 @@ def prepare_model(args):
 
 	params_to_learn = []
 	for name, param in model.named_parameters():
-		print(name, param.size())
-		if name == 'fc':
+		if name.startswith('fc'):
 			params_to_learn.append(param)
 		else:
 			param.requires_grad = False
