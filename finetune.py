@@ -14,7 +14,7 @@ import torch
 import torchvision
 
 from models import BarlowTwins, SimCLR, ResNet18
-from loading_utils import get_finetune_dataloaders
+from loading_utils import get_finetune_data_loaders
 
 
 def prepare_model(args):
@@ -53,7 +53,7 @@ def train(args, model, params_to_learn, device='cuda:0'):
 	optimizer = optim.SGD(params_to_learn, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.decay_epochs, gamma=args.lr_decay)
 
-	train_loader, testloader = get_finetune_dataloaders(args)
+	train_loader, testloader = get_finetune_data_loaders(args)
 
 	start_time = time.time()
 	start_epoch = 0
