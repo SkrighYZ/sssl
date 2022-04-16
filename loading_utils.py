@@ -88,7 +88,7 @@ def get_finetune_data_loaders(args):
         trainset = Stream51Dataset(args.images_dir, test=False, ordering=args.order, transform=train_transform, bbox_crop=True, ratio=1.10)
         testset = Stream51Dataset(args.images_dir, test=True, ordering=args.order, transform=test_transform, bbox_crop=True, ratio=1.10)
     
-    elif args.dataset = 'tiny-in':
+    elif args.dataset = 'tinyimagenet':
         train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(64, interpolation=Image.BICUBIC),
                 transforms.RandomHorizontalFlip(),
@@ -102,8 +102,8 @@ def get_finetune_data_loaders(args):
                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                     std=[0.229, 0.224, 0.225])
         ])
-        trainset = ImageFolder(root='tiny-imagenet-200/train/', transform=train_transform)
-        testset = ImageFolder(root='tiny-imagenet-200/val_restruc/', transform=test_transform)
+        trainset = ImageFolder(root=args.images_dir+'/train/', transform=train_transform)
+        testset = ImageFolder(root=args.images_dir+'/val_restruc/', transform=test_transform)
     
     else:
         raise NotImplementedError
