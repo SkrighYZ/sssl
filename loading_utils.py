@@ -102,8 +102,8 @@ def get_finetune_data_loaders(args):
                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                     std=[0.229, 0.224, 0.225])
         ])
-        trainset = ImageFolder(root=args.images_dir+'/train/', transform=train_transform)
-        testset = ImageFolder(root=args.images_dir+'/val_restruc/', transform=test_transform)
+        trainset = ImageFolder(root=args.images_dir / 'train', transform=train_transform)
+        testset = ImageFolder(root=args.images_dir / 'val_restruc', transform=test_transform)
     
     else:
         raise NotImplementedError
