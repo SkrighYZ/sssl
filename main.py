@@ -161,7 +161,7 @@ def main():
 	parser.add_argument('--weight_decay', type=float, default=1e-6)
 	parser.add_argument('--momentum', default=0.9, type=float)
 
-	parser.add_argument('--num_workers', type=int, default=4)
+	parser.add_argument('--num_workers', type=int, default=8)
 	parser.add_argument('--print_freq', default=400, type=int, metavar='N', help='print frequency')
 	parser.add_argument('--save_freq', default=5, type=int, metavar='N', help='save frequency')
 

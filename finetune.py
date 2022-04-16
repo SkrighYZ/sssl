@@ -69,15 +69,14 @@ def train(args, model, params_to_learn, device='cuda:0'):
 			inputs = data.cuda(non_blocking=True)
 			targets = labels.cuda(non_blocking=True)
 
-			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
-
 			loss = criterion(model(inputs), targets)
-
 			loss.backward()
 			optimizer.step()
 
 			loss_total += loss.item()
+
+		scheduler.step()
 
 		stats = dict(epoch=epoch,
 				lr=optimizer.param_groups[0]['lr'],
