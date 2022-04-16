@@ -14,7 +14,10 @@ import torch
 
 from models import BarlowTwins, SimCLR, ResNet18
 
-from loading_utils import get_stream_data_loaders
+from loading_utils import get_finetune_dataloaders
+
+def prepare_model(dir_name):
+
 
 def adjust_learning_rate(args, optimizer, loader, step):
 	max_steps = args.epochs * len(loader)
@@ -36,21 +39,13 @@ def train(args, model, device='cuda:0'):
 
 	model.to(device)
 
-	param_weights = []
-	param_biases = []
-	for param in model.parameters():
-		if param.ndim == 1:
-			param_biases.append(param)
-		else:
-			param_weights.append(param)
-	parameters = [{'params': param_weights, 'lr': args.learning_rate_weights}, 
-				{'params': param_biases, 'lr': args.learning_rate_biases}]
-	optimizer = optim.SGD(parameters, lr=args.learning_rate_weights, momentum=args.momentum, weight_decay=args.weight_decay)
+	optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
 
-	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args)
+	trainset, testset = get_datasets(args)
+	train_loader = DataLoader(trainset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers)
+	test_loader = DataLoader(testset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
-	if args.model == 'sliding_supervised':
-		criterion = nn.CrossEntropyLoss().to(device)
+	criterion = nn.CrossEntropyLoss().to(device)
 
 	model.train()
 	start_time = time.time()
@@ -58,48 +53,17 @@ def train(args, model, device='cuda:0'):
 	
 	for epoch in range(start_epoch, args.epochs):
 
-		dataset.shuffle()
-		if replay_sampler:
-			replay_sampler.rehearsal_ixs = list(range(args.batch_size-1))
-			replay_iter = iter(replay_loader)
-
 		loss_total = 0
 
-		for step, ((y1, y2), labels) in enumerate(train_loader, start=epoch*len(train_loader)):
+		for step, (batch, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 
-			# pickle.dump(y1, open('../y1.pkl', 'wb'))
-			# pickle.dump(y2, open('../y2.pkl', 'wb'))
-			# break
-			
-			if replay_sampler:
-
-				if step < args.batch_size-1:
-					continue
-
-				# Update sliding window buffer
-				if step < args.buffer_size:
-					replay_sampler.rehearsal_ixs += [step]
-				else:
-					replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
-
-				if (step + 1) % args.batch_size != 0:
-					continue
-
-				(replay_y1, replay_y2), _ = next(replay_iter)
-				y1_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y1.cuda(non_blocking=True)], dim=0)
-				y2_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y2.cuda(non_blocking=True)], dim=0)
-
-			else:
-				y1_inputs = y1.cuda(non_blocking=True)
-				y2_inputs = y2.cuda(non_blocking=True)
+			inputs = batch.cuda(non_blocking=True)
+			targets = labels.cuda(non_blocking=True)
 
 			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
 
-			if args.model == 'sliding_supervised':
-				loss = criterion(model(y1_inputs), labels.cuda(non_blocking=True))
-			else:
-				loss = model(y1_inputs, y2_inputs)
+			loss = criterion(model(inputs), targets)
 
 			loss.backward()
 			optimizer.step()

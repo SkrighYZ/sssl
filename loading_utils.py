@@ -7,6 +7,7 @@ from PIL import Image, ImageOps, ImageFilter
 import torch
 from torch.utils.data import DataLoader
 import torchvision.transforms as transforms
+from torchvision.datasets import ImageFolder
 
 from Stream51Dataset import Stream51Dataset
 
@@ -67,23 +68,50 @@ def get_stream_data_loaders(args):
 
     return dataset, train_loader, replay_loader, replay_sampler
 
-def get_test_data_loaders(args):
+
+def get_finetune_data_loaders(args):
 
     if args.dataset == 'stream51':
-        transform = transforms.Compose([
+        train_transform = transforms.Compose([
+                transforms.RandomResizedCrop(64, scale=(0.5, 1), interpolation=Image.BICUBIC),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                    std=[0.229, 0.224, 0.225])
+        ])
+        test_transform = transforms.Compose([
                 transforms.Resize(64, interpolation=Image.BICUBIC),
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                     std=[0.229, 0.224, 0.225])
-            ])
-        dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=transform, bbox_crop=True, ratio=1.10)
+        ])
+        trainset = Stream51Dataset(args.images_dir, test=False, ordering=args.order, transform=train_transform, bbox_crop=True, ratio=1.10)
+        testset = Stream51Dataset(args.images_dir, test=True, ordering=args.order, transform=test_transform, bbox_crop=True, ratio=1.10)
+    
+    elif args.dataset = 'tiny-in':
+        train_transform = transforms.Compose([
+                transforms.RandomResizedCrop(64, interpolation=Image.BICUBIC),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                    std=[0.229, 0.224, 0.225])
+        ])
+        test_transform = transforms.Compose([
+                transforms.Resize(64, interpolation=Image.BICUBIC),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                                    std=[0.229, 0.224, 0.225])
+        ])
+        trainset = ImageFolder(root='tiny-imagenet-200/train/', transform=train_transform)
+        testset = ImageFolder(root='tiny-imagenet-200/val_restruc/', transform=test_transform)
+    
     else:
         raise NotImplementedError
 
-    batch_size = args.batch_size 
-    test_loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+    train_loader = DataLoader(trainset, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
+    test_loader = DataLoader(testset, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
-    return test_loader
+    return train_loader, test_loader
 
 
 
