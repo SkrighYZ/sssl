@@ -1,7 +1,6 @@
 import glob
 import os
 from shutil import copy
-import config
 
 old_folder = '../data/tiny-imagenet-200/val/'
 new_folder = '../data/tiny-imagenet-200/val_restruc/'
