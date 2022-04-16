@@ -88,7 +88,7 @@ def get_finetune_data_loaders(args):
         trainset = Stream51Dataset(args.images_dir, test=False, ordering=args.order, transform=train_transform, bbox_crop=True, ratio=1.10)
         testset = Stream51Dataset(args.images_dir, test=True, ordering=args.order, transform=test_transform, bbox_crop=True, ratio=1.10)
     
-    elif args.dataset = 'tinyimagenet':
+    elif args.dataset == 'tinyimagenet':
         train_transform = transforms.Compose([
                 transforms.RandomResizedCrop(64, interpolation=Image.BICUBIC),
                 transforms.RandomHorizontalFlip(),
