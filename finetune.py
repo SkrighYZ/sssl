@@ -22,11 +22,11 @@ def prepare_model(args):
 	model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
 	model.maxpool = nn.Sequential()
 
-	if 'bt' in args.ckpt_dir:
+	if 'bt' in str(args.ckpt_dir):
 		model.fc = nn.Identity()
 		ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
 		model.load_state_dict(ckpt)
-	elif 'sup' in args.ckpt_dir:
+	elif 'sup' in str(args.ckpt_dir):
 		model.fc = nn.Linear(512, args.pretrained_num_classes)
 		ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
 		model.load_state_dict(ckpt)
