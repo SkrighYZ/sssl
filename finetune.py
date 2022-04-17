@@ -95,7 +95,7 @@ def train(args, model, params_to_learn, device='cuda:0'):
 		with open(args.ckpt_dir / 'finetune_logs.json', 'w') as f:
 			json.dump(training_logs, f, indent=4)
 
-	torch.save(model.state_dict(), args.ckpt_dir / 'linear_'+args.dataset+'.pth')
+	torch.save(model.state_dict(), args.ckpt_dir / ('linear_'+args.dataset+'.pth'))
 
 	return model
 
