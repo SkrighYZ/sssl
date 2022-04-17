@@ -53,7 +53,7 @@ def train(args, model, params_to_learn, device='cuda:0'):
 	optimizer = optim.SGD(params_to_learn, lr=args.learning_rate, momentum=args.momentum, weight_decay=args.weight_decay)
 	scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=args.decay_epochs, gamma=args.lr_decay)
 
-	train_loader, testloader = get_finetune_data_loaders(args)
+	train_loader, test_loader = get_finetune_data_loaders(args)
 
 	start_time = time.time()
 	start_epoch = 0
@@ -108,7 +108,7 @@ def eval(args, model, test_loader):
 			preds = model(inputs)
 			correct += (preds.argmax(1) == targets).type(torch.float).sum().item()
 
-	acc = correct / len(dataloader.dataset)
+	acc = correct / len(test_loader.dataset)
 	print('Testing Accuracy: {}'.format(acc))
 
 	return acc
@@ -125,7 +125,7 @@ def main():
 	parser.add_argument('--batch_size', type=int, default=256)
 
 	parser.add_argument('--epochs', type=int, default=100)
-	parser.add_argument('--learning_rate', type=float, default=0.2)
+	parser.add_argument('--learning_rate', type=float, default=0.3)
 	parser.add_argument('--lr_decay', type=float, default=0.1)
 	parser.add_argument('--decay_epochs', nargs='+', type=int, default=[40, 80], help='learning rate decay epochs')
 	parser.add_argument('--weight_decay', type=float, default=1e-4)
