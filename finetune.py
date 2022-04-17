@@ -22,7 +22,9 @@ def prepare_model(args):
 	model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
 	model.maxpool = nn.Sequential()
 
-	if 'bt' in str(args.ckpt_dir):
+	if 'random' in str(args.ckpt_dir):
+		pass
+	elif 'bt' in str(args.ckpt_dir):
 		model.fc = nn.Identity()
 		ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
 		model.load_state_dict(ckpt)
