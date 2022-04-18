@@ -17,7 +17,7 @@ python main.py \
 	--print_freq 400 \
 	--save_freq 1 \
 	--projector 2048-2048 \
-	--save_dir ../models/instance_bt
+	--save_dir ../models/reservoir_bt
 
 # python main.py \
 #   --mode train \
