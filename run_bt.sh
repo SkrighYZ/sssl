@@ -2,6 +2,7 @@
 
 
 python main.py \
+	--mode train \
 	--order instance \
 	--model reservoir_bt \
 	--ltm_size 8 \
@@ -19,6 +20,7 @@ python main.py \
 	--save_dir ../models/instance_bt
 
 # python main.py \
+#   --mode train \
 # 	--order iid \
 # 	--model sliding_bt \
 # 	--batch_size 256 \
