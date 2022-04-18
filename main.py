@@ -70,7 +70,7 @@ def train(args, model, device='cuda:0'):
 			t += 1
 
 			print(t)
-			if t == 0 or t > 550:
+			if t == 1 or t > 550:
 				print(epoch, train_loader.batch_sampler.curr_batch_idx)
 			continue
 			if args.model == 'sliding_supervised':
