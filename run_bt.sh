@@ -11,14 +11,14 @@ python main.py \
 	--batch_size 256 \
 	--epochs 10 \
 	--warmup_epochs 1 \
-	--learning_rate_weights 0.3 \
+	--learning_rate_weights 0.1 \
 	--learning_rate_biases 0.005 \
 	--lr_decay 1 \
 	--print_freq 400 \
 	--save_freq 1 \
 	--projector 2048-2048 \
 	--save_dir ../models/reservoir_bt \
-	--num_workers 0
+	--num_workers 8
 
 # python main.py \
 #   --mode train \
