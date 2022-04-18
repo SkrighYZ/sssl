@@ -11,7 +11,7 @@ python main.py \
 	--batch_size 256 \
 	--epochs 10 \
 	--warmup_epochs 1 \
-	--learning_rate_weights 0.1 \
+	--learning_rate_weights 0.3 \
 	--learning_rate_biases 0.005 \
 	--lr_decay 1 \
 	--print_freq 400 \
