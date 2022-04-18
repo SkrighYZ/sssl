@@ -59,9 +59,9 @@ def train(args, model, device='cuda:0'):
 	for epoch in range(start_epoch, args.epochs):
 
 		dataset.shuffle()
-		#if replay_sampler:
-		replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
-		replay_iter = iter(replay_loader)
+		if replay_sampler is not None:
+			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
+			replay_iter = iter(replay_loader)
 
 		loss_total = 0
 
@@ -76,7 +76,7 @@ def train(args, model, device='cuda:0'):
 			if not args.model == 'sliding_supervised':
 				y1, y2 = y
 			
-			if replay_sampler:
+			if replay_sampler is not None:
 
 				if t < args.stm_size:
 					continue
