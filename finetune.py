@@ -126,10 +126,10 @@ def main():
 
 	parser.add_argument('--batch_size', type=int, default=256)
 
-	parser.add_argument('--epochs', type=int, default=100)
-	parser.add_argument('--learning_rate', type=float, default=0.3)
+	parser.add_argument('--epochs', type=int, default=50)
+	parser.add_argument('--learning_rate', type=float, default=0.2)
 	parser.add_argument('--lr_decay', type=float, default=0.1)
-	parser.add_argument('--decay_epochs', nargs='+', type=int, default=[40, 80], help='learning rate decay epochs')
+	parser.add_argument('--decay_epochs', nargs='+', type=int, default=[25, 45], help='learning rate decay epochs')
 	parser.add_argument('--weight_decay', type=float, default=1e-4)
 	parser.add_argument('--momentum', default=0.9, type=float)
 
