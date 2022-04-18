@@ -62,7 +62,7 @@ def train(args, model, device='cuda:0'):
 		if replay_sampler is not None:
 			print('Simulating batches...')
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
-			replay_sampler.simulate_batches(args.stm_size, args.ltm_size, args.batch_size, num_examples=len(dataset))
+			replay_sampler.simulate_batches(ltm_size=args.ltm_size, stm_size=args.stm_size, batch_size=args.batch_size, num_examples=len(dataset))
 
 		loss_total = 0
 
