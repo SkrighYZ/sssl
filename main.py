@@ -70,8 +70,8 @@ def train(args, model, device='cuda:0'):
 			t += 1
 
 			print(t)
-			if epoch == 1 and t == 0:
-				print(train_loader.batch_sampler.curr_batch_idx)
+			if t == 0 or t > 550:
+				print(epoch, train_loader.batch_sampler.curr_batch_idx)
 			continue
 			if args.model == 'sliding_supervised':
 				inputs = y.cuda(non_blocking=True)
