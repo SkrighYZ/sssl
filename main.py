@@ -47,7 +47,7 @@ def train(args, model, device='cuda:0'):
 				{'params': param_biases, 'lr': args.learning_rate_biases}]
 	optimizer = optim.SGD(parameters, lr=args.learning_rate_weights, momentum=args.momentum, weight_decay=args.weight_decay)
 
-	dataset, train_loader, replay_loader, replay_sampler = get_stream_data_loaders(args)
+	dataset, train_loader, replay_sampler = get_stream_data_loaders(args)
 
 	if args.model == 'sliding_supervised':
 		criterion = nn.CrossEntropyLoss().to(device)
@@ -61,42 +61,20 @@ def train(args, model, device='cuda:0'):
 		dataset.shuffle()
 		if replay_sampler is not None:
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
+			replay_sampler.simulate_batches(args.stm_size, args.ltm_size, args.batch_size, num_examples=len(dataset))
 			replay_iter = iter(replay_loader)
 
 		loss_total = 0
 
-		t = -1
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
-			t += 1
-
-			# pickle.dump(y1, open('../y1.pkl', 'wb'))
-			# pickle.dump(y2, open('../y2.pkl', 'wb'))
-			# break
 
 			if not args.model == 'sliding_supervised':
 				y1, y2 = y
-			
-			if replay_sampler is not None:
-
-				if t < args.stm_size:
-					continue
-				elif t < args.ltm_size:
-					replay_sampler.update_memory(t, update_ltm=False)
-				else:
-					replay_sampler.update_memory(t, update_ltm=True)
-
-				if (step + 1) % args.batch_size != 0:
-					continue
-
-				(y1, y2), _ = next(replay_iter)
-				y1_inputs = y1.cuda(non_blocking=True)
-				y2_inputs = y2.cuda(non_blocking=True)
-				# y1_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y1.cuda(non_blocking=True)], dim=0)
-				# y2_inputs = torch.cat([y2.cuda(non_blocking=True), replay_y2.cuda(non_blocking=True)], dim=0)
 
 			elif args.model == 'sliding_supervised':
 				inputs = y.cuda(non_blocking=True)
 				targets = labels.cuda(non_blocking=True)
+
 			else:
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
