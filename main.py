@@ -69,7 +69,8 @@ def train(args, model, device='cuda:0'):
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 			t += 1
 
-			print(t)
+			if t % 50 == 0:
+				print(t)
 			if t == 1 or t > 550:
 				print(epoch, train_loader.batch_sampler.curr_batch_idx)
 			continue
