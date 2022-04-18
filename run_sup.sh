@@ -6,7 +6,6 @@ python main.py \
 	--order instance \
 	--model sliding_supervised \
 	--batch_size 256 \
-	--buffer_size 256 \
 	--epochs 10 \
 	--warmup_epochs 1 \
 	--learning_rate_weights 0.2 \
@@ -24,7 +23,6 @@ python main.py \
 # 	--order iid \
 # 	--model sliding_supervised \
 # 	--batch_size 256 \
-# 	--buffer_size 256 \
 # 	--epochs 10 \
 # 	--warmup_epochs 1 \
 # 	--learning_rate_weights 0.2 \

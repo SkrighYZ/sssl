@@ -60,12 +60,14 @@ def train(args, model, device='cuda:0'):
 
 		dataset.shuffle()
 		if replay_sampler:
-			replay_sampler.rehearsal_ixs = list(range(args.batch_size-1))
+			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
 			replay_iter = iter(replay_loader)
 
 		loss_total = 0
 
+		t = -1
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
+			t += 1
 
 			# pickle.dump(y1, open('../y1.pkl', 'wb'))
 			# pickle.dump(y2, open('../y2.pkl', 'wb'))
@@ -76,21 +78,21 @@ def train(args, model, device='cuda:0'):
 			
 			if replay_sampler:
 
-				if step < args.batch_size-1:
+				if t < args.stm_size:
 					continue
-
-				# Update sliding window buffer
-				if step < args.buffer_size:
-					replay_sampler.rehearsal_ixs += [step]
+				elif t < args.ltm_size:
+					replay_sampler.update_memory(t, update_ltm=False)
 				else:
-					replay_sampler.rehearsal_ixs = replay_sampler.rehearsal_ixs[1:] + [step]
+					replay_sampler.update_memory(t, update_ltm=True)
 
 				if (step + 1) % args.batch_size != 0:
 					continue
 
-				(replay_y1, replay_y2), _ = next(replay_iter)
-				y1_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y1.cuda(non_blocking=True)], dim=0)
-				y2_inputs = torch.cat([y2.cuda(non_blocking=True), replay_y2.cuda(non_blocking=True)], dim=0)
+				y1, y2, _ = next(replay_iter)
+				y1_inputs = y1.cuda(non_blocking=True)
+				y2_inputs = y2.cuda(non_blocking=True)
+				# y1_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y1.cuda(non_blocking=True)], dim=0)
+				# y2_inputs = torch.cat([y2.cuda(non_blocking=True), replay_y2.cuda(non_blocking=True)], dim=0)
 
 			elif args.model == 'sliding_supervised':
 				inputs = y.cuda(non_blocking=True)
@@ -151,7 +153,9 @@ def main():
 						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr', 'sliding_supervised'])
 
 	parser.add_argument('--batch_size', type=int, default=256)
-	parser.add_argument('--buffer_size', type=int, default=256)
+	parser.add_argument('--ltm_size', type=int, default=128)
+	parser.add_argument('--stm_size', type=int, default=128)
+	parser.add_argument('--stm_span', type=int, default=1000)
 
 	parser.add_argument('--epochs', type=int, default=5)
 	parser.add_argument('--warmup_epochs', type=int, default=1)

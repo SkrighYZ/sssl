@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.random import default_rng
+from numpy.random import default_rng, randint
 import random
 import os
 
@@ -14,35 +14,59 @@ from Stream51Dataset import Stream51Dataset
 
 class RehearsalBatchSampler(torch.utils.data.Sampler):
     """
-    A sampler that returns a generator obj30216ect which randomly samples from a list, that holds the indices that are
+    A sampler that returns a generator object which randomly samples from memory, that holds the indices that are
     eligible for rehearsal.
     The samples that are eligible for rehearsal grows over time, so we want it to be a 'generator' object and not an
     iterator object.
     """
 
-    # See: https://github.com/pytorch/pytorch/issues/683
-    def __init__(self, rehearsal_ixs, num_rehearsal_samples):
-        # This makes sure that different workers have different randomness and don't end up returning the same data
-        # item!
-        self.rehearsal_ixs = rehearsal_ixs  # These are the samples which can be replayed. This list can grow over time.
+    def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[]):
+        self.long_term_mem = long_term_mem  
+        self.short_term_mem = short_term_mem
+        self.stm_time_passed = None  # need to call init_memory()
+        self.stm_span = stm_span
+
         self.num_rehearsal_samples = num_rehearsal_samples
 
         self.rng = default_rng(seed=os.getpid())
 
     def __iter__(self):
-        # We are returning a generator instead of an iterator, because the data points we want to sample from, differs
-        # every time we loop through the data.
-        # e.g., if we are seeing 100th sample, we may want to do a replay by sampling from 0-99 samples. But then,
-        # when we see 101th sample, we want to replay from 0-100 samples instead of 0-99.
-
         while True:
-            #ix = np.random.randint(0, len(self.rehearsal_ixs), self.num_rehearsal_samples)
-            ix = self.rng.choice(len(self.rehearsal_ixs), self.num_rehearsal_samples, replace=False)
-            yield np.array([self.rehearsal_ixs[_curr_ix] for _curr_ix in ix])
+            rehearsal_idxs = self.long_term_mem + self.short_term_mem
+            if self.num_rehearsal_samples == len(rehearsal_idxs):
+                print(rehearsal_idxs)
+                yield np.array(rehearsal_idxs)
+            else:
+                ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
+                yield np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix])
 
     def __len__(self):
-        return 2 ** 64  # Returning a very large number because we do not want it to stop replaying.
+        # Returning a very large number because we do not want it to stop replaying.
         # The stop criteria must be defined in some other manner.
+        return 2 ** 64  
+
+    def init_memory(self, ltm_size, stm_size):
+        self.long_term_mem = list(range(ltm_size))
+        self.short_term_mem = list(range(stm_size))
+        self.stm_time_passed = np.linspace(len(self.short_term_mem)-1, -1, -1)
+
+    def update_memory(self, t, update_ltm=True):
+        # Assume long term memory is larger
+        if update_ltm:
+            # Update long term memory
+            replace_idx = randint(0, t+1)
+            if replace_idx < len(self.long_term_mem):
+                self.long_term_mem[replace_idx] = t
+            replace_idx = randint(0, t+1)
+
+        # Update short term memory
+        replace_idx = randint(0, self.stm_span+1)
+        if replace_idx < len(self.short_term_mem):
+            if np.max(self.stm_time_passed) > self.stm_span:
+                replace_idx = np.argmax(self.stm_time_passed)
+            self.short_term_mem[replace_idx] = t
+            self.stm_time_passed[replace_idx] = 0
+        self.stm_time_passed += 1
 
 
 def get_stream_data_loaders(args):
@@ -63,7 +87,8 @@ def get_stream_data_loaders(args):
         replay_sampler = None
         replay_loader = None
     else:
-        replay_sampler = RehearsalBatchSampler(rehearsal_ixs=[], num_rehearsal_samples=args.batch_size-1)
+        replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, num_rehearsal_samples=args.batch_size)
+        replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
         replay_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     return dataset, train_loader, replay_loader, replay_sampler
