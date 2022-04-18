@@ -95,11 +95,10 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
     def __iter__(self):
         while True:
-            if self.curr_batch_idx >= self.batches.shape[0]:
-                yield None
             #print(self.batches[self.curr_batch_idx].tolist())
             yield self.batches[self.curr_batch_idx]
-            self.curr_batch_idx += 1
+            if self.curr_batch_idx < self.batches.shape[0]-1:
+                self.curr_batch_idx += 1
 
     def __len__(self):
         return self.batches.shape[0]
