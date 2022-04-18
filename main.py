@@ -183,6 +183,8 @@ def main():
 
 	if args.model == 'sliding_bt':
 		model = BarlowTwins(args)
+	elif args.model == 'reservoir_bt':
+		model = BarlowTwins(args)
 	elif args.model == 'sliding_supervised':
 		model = ResNet18(args)
 	else:
