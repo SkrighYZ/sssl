@@ -110,7 +110,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
     def simulate_batches(self, stm_size, ltm_size, batch_size, num_examples):
 
         self.batches = np.zeros((num_examples//batch_size+1, batch_size))
-        current_batch_idx = 0
+        curr = 0
         for t in tqdm(range(num_examples)):
             if t < stm_size:
                 continue
@@ -126,8 +126,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
                 else:
                     ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
                     batch = np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix])         
-                self.batches[curr_batch_idx, :] = batch
-                curr_batch_idx += 1
+                self.batches[curr, :] = batch
+                curr += 1
         
         # Last batch
         rehearsal_idxs = self.long_term_mem + self.short_term_mem
@@ -136,7 +136,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         else:
             ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
             batch = np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix])
-        self.batches[curr_batch_idx, :] = batch
+        self.batches[curr, :] = batch
 
     def update_memory(self, t, update_ltm=True):
         # Assume long term memory is larger
