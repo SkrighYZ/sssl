@@ -63,7 +63,7 @@ def train(args, model, device='cuda:0'):
 			print('Simulating bacthes...')
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
 			replay_sampler.simulate_batches(args.stm_size, args.ltm_size, args.batch_size, num_examples=len(dataset))
-			replay_iter = iter(replay_loader)
+			#replay_iter = iter(replay_loader)
 
 		loss_total = 0
 
