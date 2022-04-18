@@ -87,7 +87,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
         self.num_rehearsal_samples = num_rehearsal_samples
         self.batches = None  # Need to call simulate_batches()
-        self.curr_batch_idx = 0
 
         self.rng = default_rng(seed=os.getpid())
 
@@ -105,7 +104,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
     def simulate_batches(self, ltm_size, stm_size, batch_size, num_examples):
 
-        self.curr_batch_idx = 0
         self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
         curr = 0
         for t in tqdm(range(num_examples)):
