@@ -8,5 +8,5 @@ python finetune.py \
 	--lr_decay 0.1 \
 	--decay_epochs 25 45 \
 	--weight_decay 1e-4 \
-	--eval_freq 10 \
+	--eval_freq 5 \
 	--ckpt_dir ../models/iid_bt
