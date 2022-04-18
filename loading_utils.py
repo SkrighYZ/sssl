@@ -95,7 +95,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
     def __iter__(self):
         while True:
-            print(self.batches[self.curr_batch_idx].tolist())
+            #print(self.batches[self.curr_batch_idx].tolist())
             yield self.batches[self.curr_batch_idx]
             self.curr_batch_idx += 1
 
@@ -138,6 +138,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
             ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
             batch = np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix])
         self.batches[curr, :] = batch
+        print(self.batches[-2:, :])
 
     def update_memory(self, t, update_ltm=True):
         # Assume long term memory is larger
