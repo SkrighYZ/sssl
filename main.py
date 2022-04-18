@@ -66,14 +66,12 @@ def train(args, model, device='cuda:0'):
 
 		loss_total = 0
 		t = 0
+		print(len(train_loader))
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 			t += 1
-
-			if t % 50 == 0:
-				print(t)
-			if t == 1 or t > 550:
-				print(epoch, train_loader.batch_sampler.curr_batch_idx)
+			print(epoch, t, train_loader.batch_sampler.curr_batch_idx)
 			continue
+
 			if args.model == 'sliding_supervised':
 				inputs = y.cuda(non_blocking=True)
 				targets = labels.cuda(non_blocking=True)

@@ -15,7 +15,7 @@ python main.py \
 	--learning_rate_biases 0.005 \
 	--lr_decay 1 \
 	--print_freq 400 \
-	--save_freq 1 \
+	--save_freq 5 \
 	--projector 2048-2048 \
 	--save_dir ../models/reservoir_bt 
 
