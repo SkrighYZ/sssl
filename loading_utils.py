@@ -108,9 +108,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         self.stm_time_passed = np.arange(len(self.short_term_mem)-1, -1, -1)
 
     def simulate_batches(self, stm_size, ltm_size, batch_size, num_examples):
-
-        long_term_mem
-
+        
         self.batches = np.zeros((num_examples//batch_size+1, batch_size))
         current_batch_idx = 0
         for t in tqdm(range(num_examples)):
