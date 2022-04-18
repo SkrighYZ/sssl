@@ -110,7 +110,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
     def simulate_batches(self, stm_size, ltm_size, batch_size, num_examples):
 
         self.curr_batch_idx = 0
-        self.batches = np.zeros((num_examples//batch_size+1, batch_size))
+        self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
         curr = 0
         for t in tqdm(range(num_examples)):
             if t < stm_size:
