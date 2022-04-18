@@ -77,8 +77,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
     """
     A sampler that returns a generator object which randomly samples from memory, that holds the indices that are
     eligible for rehearsal.
-    The samples that are eligible for rehearsal grows over time, so we want it to be a 'generator' object and not an
-    iterator object.
     """
 
     def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[]):
@@ -96,8 +94,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
     def __iter__(self):
         for batch_idx in range(self.batches.shape[0]):
             yield self.batches[batch_idx]
-            # yield self.batches[self.curr_batch_idx]
-            # self.curr_batch_idx += 1
 
     def __len__(self):
         return self.batches.shape[0]

@@ -55,7 +55,7 @@ class Stream51Dataset(data.Dataset):
         if test:
             self.samples = json.load(open(os.path.join(root, 'Stream-51_meta_test.json')))
         else:
-            self.samples = json.load(open(os.path.join(root, 'Stream-51_meta_train.json')))[:1000]
+            self.samples = json.load(open(os.path.join(root, 'Stream-51_meta_train.json')))
         self.targets = [s[0] for s in self.samples]
 
         self.ordering = ordering

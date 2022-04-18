@@ -65,17 +65,11 @@ def train(args, model, device='cuda:0'):
 			replay_sampler.simulate_batches(ltm_size=args.ltm_size, stm_size=args.stm_size, batch_size=args.batch_size, num_examples=len(dataset))
 
 		loss_total = 0
-		t = 0
-		print(len(train_loader))
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
-			t += 1
-			print(epoch, t, train_loader.batch_sampler.curr_batch_idx)
-			continue
 
 			if args.model == 'sliding_supervised':
 				inputs = y.cuda(non_blocking=True)
 				targets = labels.cuda(non_blocking=True)
-
 			else:
 				y1, y2 = y
 				y1_inputs = y1.cuda(non_blocking=True)
