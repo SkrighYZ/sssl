@@ -60,7 +60,7 @@ def train(args, model, device='cuda:0'):
 
 		dataset.shuffle()
 		if replay_sampler is not None:
-			print('Simulating bacthes...')
+			print('Simulating batches...')
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
 			replay_sampler.simulate_batches(args.stm_size, args.ltm_size, args.batch_size, num_examples=len(dataset))
 
