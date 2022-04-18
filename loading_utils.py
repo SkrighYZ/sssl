@@ -34,7 +34,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         while True:
             rehearsal_idxs = self.long_term_mem + self.short_term_mem
             if self.num_rehearsal_samples == len(rehearsal_idxs):
-                print(rehearsal_idxs)
+                #print(rehearsal_idxs)
                 yield np.array(rehearsal_idxs)
             else:
                 ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
