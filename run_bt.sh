@@ -5,10 +5,10 @@ python main.py \
 	--mode train \
 	--order instance \
 	--model reservoir_bt \
-	--ltm_size 4 \
-	--stm_size 4 \
-	--stm_span 20 \
-	--batch_size 8 \
+	--ltm_size 128 \
+	--stm_size 128 \
+	--stm_span 1000 \
+	--batch_size 256 \
 	--epochs 10 \
 	--warmup_epochs 1 \
 	--learning_rate_weights 0.3 \
@@ -18,7 +18,7 @@ python main.py \
 	--save_freq 1 \
 	--projector 2048-2048 \
 	--save_dir ../models/reservoir_bt \
-	--num_workers 0
+	--num_workers 8
 
 # python main.py \
 #   --mode train \
