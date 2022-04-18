@@ -95,7 +95,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
     def __iter__(self):
         while True:
-            print(self.batches[self.curr_batch_idx].list())
+            print(self.batches[self.curr_batch_idx].tolist())
             yield self.batches[self.curr_batch_idx]
             self.curr_batch_idx += 1
 
@@ -109,6 +109,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
     def simulate_batches(self, stm_size, ltm_size, batch_size, num_examples):
 
+        self.curr_batch_idx = 0
         self.batches = np.zeros((num_examples//batch_size+1, batch_size))
         curr = 0
         for t in tqdm(range(num_examples)):
