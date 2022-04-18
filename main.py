@@ -88,7 +88,7 @@ def train(args, model, device='cuda:0'):
 				if (step + 1) % args.batch_size != 0:
 					continue
 
-				y1, y2, _ = next(replay_iter)
+				(y1, y2), _ = next(replay_iter)
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
 				# y1_inputs = torch.cat([y1.cuda(non_blocking=True), replay_y1.cuda(non_blocking=True)], dim=0)
