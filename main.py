@@ -69,14 +69,12 @@ def train(args, model, device='cuda:0'):
 
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 
-			if not args.model == 'sliding_supervised':
-				y1, y2 = y
-
-			elif args.model == 'sliding_supervised':
+			if args.model == 'sliding_supervised':
 				inputs = y.cuda(non_blocking=True)
 				targets = labels.cuda(non_blocking=True)
 
 			else:
+				y1, y2 = y
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
 

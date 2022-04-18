@@ -126,7 +126,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
                     batch = np.array(rehearsal_idxs)
                 else:
                     ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
-                    batch = np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix])         
+                    batch = np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix], dtype=int)         
                 self.batches[curr, :] = batch
                 curr += 1
         
