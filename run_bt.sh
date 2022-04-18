@@ -18,7 +18,7 @@ python main.py \
 	--save_freq 1 \
 	--projector 2048-2048 \
 	--save_dir ../models/reservoir_bt \
-	--num_workers 1
+	--num_workers 8
 
 # python main.py \
 #   --mode train \
