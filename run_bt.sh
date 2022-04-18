@@ -5,10 +5,10 @@ python main.py \
 	--mode train \
 	--order instance \
 	--model reservoir_bt \
-	--ltm_size 8 \
-	--stm_size 8 \
+	--ltm_size 4 \
+	--stm_size 4 \
 	--stm_span 20 \
-	--batch_size 16 \
+	--batch_size 8 \
 	--epochs 10 \
 	--warmup_epochs 1 \
 	--learning_rate_weights 0.3 \

@@ -48,7 +48,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
     def init_memory(self, ltm_size, stm_size):
         self.long_term_mem = list(range(ltm_size))
         self.short_term_mem = list(range(stm_size))
-        self.stm_time_passed = np.linspace(len(self.short_term_mem)-1, -1, -1)
+        self.stm_time_passed = np.arange(len(self.short_term_mem)-1, -1, -1)
 
     def update_memory(self, t, update_ltm=True):
         # Assume long term memory is larger
