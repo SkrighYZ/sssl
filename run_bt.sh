@@ -5,9 +5,9 @@ python main.py \
 	--mode train \
 	--order instance \
 	--model reservoir_bt \
-	--ltm_size 192 \
-	--stm_size 64 \
-	--stm_span 1000 \
+	--ltm_size 255 \
+	--stm_size 1 \
+	--stm_span 1 \
 	--batch_size 128 \
 	--epochs 10 \
 	--warmup_epochs 1 \
@@ -17,7 +17,7 @@ python main.py \
 	--print_freq 400 \
 	--save_freq 5 \
 	--projector 2048-2048 \
-	--save_dir ../models/reservoir_bt_b128
+	--save_dir ../models/reservoir_bt_stm1
 
 # python main.py \
 #   --mode train \
