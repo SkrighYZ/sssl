@@ -110,12 +110,15 @@ def train(args, model, device='cuda:0'):
 				lr=optimizer.param_groups[0]['lr'],
 				avg_loss=loss_total/len(train_loader),
 				time=int(time.time() - start_time))
+		loss_logs.append(loss_total/len(train_loader))
 		loss_total = 0
 		print(json.dumps(stats))
 		print('-----------------')
 
 	torch.save(model.backbone.state_dict(), args.save_dir / 'resnet18.pth')
-	pickle.dump(loss_logs, open(args.save_dir / 'loss_logs.pkl', 'wb'))
+
+	with open(args.save_dir / 'loss_logs.txt', 'w') as f:
+		f.write('\n'.join([str(ll) for ll in loss_logs]))
 
 	return model
 
