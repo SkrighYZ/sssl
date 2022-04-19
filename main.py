@@ -8,6 +8,7 @@ import random
 import sys
 from pathlib import Path
 import pickle
+import copy.deepcopy as deepcopy
 
 from torch import optim, nn
 import torch
@@ -156,6 +157,9 @@ def main():
 		os.makedirs(args.save_dir)
 
 	with open(args.save_dir / 'args.txt', 'w') as f:
+		args_copy = deepcopy(args.__dict__)
+		args_copy['images_dir'] = str(args.images_dir)
+		args_copy['save_dir'] = str(args.save_dir)
 		json.dump(args.__dict__, f, indent=2)
 
 	if args.model == 'sliding_bt':
