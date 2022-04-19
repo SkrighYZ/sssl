@@ -155,6 +155,9 @@ def main():
 	if not os.path.exists(args.save_dir):
 		os.makedirs(args.save_dir)
 
+	with open(args.save_dir / 'args.txt', 'w') as f:
+    	json.dump(args.__dict__, f, indent=2)
+
 	if args.model == 'sliding_bt':
 		model = BarlowTwins(args)
 	elif args.model == 'reservoir_bt':

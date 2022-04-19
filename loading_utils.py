@@ -119,8 +119,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
                 if self.num_rehearsal_samples == len(rehearsal_idxs):
                     batch = np.array(rehearsal_idxs)
                 else:
-                    ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
-                    batch = np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix], dtype=int)         
+                	# Use all samples in stm and randomly select samples in ltm
+                    ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples, replace=False)
+            		batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)       
                 self.batches[curr, :] = batch
                 curr += 1
         
@@ -129,9 +130,13 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
         if self.num_rehearsal_samples == len(rehearsal_idxs):
             batch = np.array(rehearsal_idxs)
         else:
-            ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
-            batch = np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix])
+        	# Use all samples in stm and randomly select samples in ltm
+            ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples, replace=False)
+            batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
         self.batches[curr, :] = batch
+
+        print(self.batches[:2, :])
+        print(self.batches[-2:, :])
 
     def update_memory(self, t, update_ltm=True):
         # Assume long term memory is larger
