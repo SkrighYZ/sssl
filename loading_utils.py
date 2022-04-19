@@ -120,7 +120,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					batch = np.array(rehearsal_idxs)
 				else:
 					# Use all samples in stm and randomly select samples in ltm
-					ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples, replace=False)
+					ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples-len(self.short_term_mem), replace=False)
 					batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)	   
 				self.batches[curr, :] = batch
 				curr += 1
@@ -131,7 +131,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			batch = np.array(rehearsal_idxs)
 		else:
 			# Use all samples in stm and randomly select samples in ltm
-			ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples, replace=False)
+			ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples-len(self.short_term_mem), replace=False)
 			batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
 		self.batches[curr, :] = batch
 
