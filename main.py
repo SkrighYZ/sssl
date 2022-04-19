@@ -56,6 +56,8 @@ def train(args, model, device='cuda:0'):
 	model.train()
 	start_time = time.time()
 	start_epoch = 0
+
+	loss_logs = []
 	
 	for epoch in range(start_epoch, args.epochs):
 
@@ -89,6 +91,8 @@ def train(args, model, device='cuda:0'):
 
 			loss_total += loss.item()
 
+			loss_logs.append(loss.item())
+
 			if (step+1) % args.print_freq == 0:
 				stats = dict(epoch=epoch,
 							step=step,
@@ -111,6 +115,7 @@ def train(args, model, device='cuda:0'):
 		print('-----------------')
 
 	torch.save(model.backbone.state_dict(), args.save_dir / 'resnet18.pth')
+	pickle.dump(loss_logs, open(args.save_dir / 'loss_logs.pkl', 'wb'))
 
 	return model
 
