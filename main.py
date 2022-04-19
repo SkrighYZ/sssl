@@ -8,7 +8,7 @@ import random
 import sys
 from pathlib import Path
 import pickle
-import copy.deepcopy as deepcopy
+from copy import deepcopy
 
 from torch import optim, nn
 import torch
