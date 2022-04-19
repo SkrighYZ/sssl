@@ -135,9 +135,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
 		self.batches[curr, :] = batch
 
-		print(self.batches[:2, :])
-		print(self.batches[-2:, :])
-
 	def update_memory(self, t, update_ltm=True):
 		# Assume long term memory is larger
 		if update_ltm:
