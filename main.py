@@ -133,7 +133,7 @@ def main():
 	parser.add_argument('--num_classes', type=int, default=51)
 	parser.add_argument('--order', type=str, default='iid', choices=['iid', 'instance'])
 	parser.add_argument('--model', type=str, default='sliding_bt',
-						choices=['sliding_bt', 'reservoir_bt', 'cluster_bt', 'sliding_simclr', 'hnm_simclr', 'sliding_supervised'])
+						choices=['sliding_bt', 'reservoir_bt', 'sliding_supervised', 'reservoir_supervised'])
 
 	parser.add_argument('--batch_size', type=int, default=256)
 	parser.add_argument('--ltm_size', type=int, default=128)
@@ -170,11 +170,9 @@ def main():
 		args_copy['save_dir'] = str(args.save_dir)
 		json.dump(args_copy, f, indent=2)
 
-	if args.model == 'sliding_bt':
+	if 'bt' in args.model:
 		model = BarlowTwins(args)
-	elif args.model == 'reservoir_bt':
-		model = BarlowTwins(args)
-	elif args.model == 'sliding_supervised':
+	elif 'supervised' in args.model:
 		model = ResNet18(args)
 	else:
 		raise NotImplementedError('Model not supported.')
