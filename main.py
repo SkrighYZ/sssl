@@ -50,7 +50,7 @@ def train(args, model, device='cuda:0'):
 
 	dataset, train_loader, replay_sampler = get_stream_data_loaders(args)
 
-	if args.model == 'sliding_supervised':
+	if 'supervised' in args.model:
 		criterion = nn.CrossEntropyLoss().to(device)
 
 	model.train()
@@ -70,7 +70,7 @@ def train(args, model, device='cuda:0'):
 		loss_total = 0
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 
-			if args.model == 'sliding_supervised':
+			if 'supervised' in args.model:
 				inputs = y.cuda(non_blocking=True)
 				targets = labels.cuda(non_blocking=True)
 			else:
@@ -81,7 +81,7 @@ def train(args, model, device='cuda:0'):
 			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
 
-			if args.model == 'sliding_supervised':
+			if 'supervised' in args.model:
 				loss = criterion(model(inputs), targets)
 			else:
 				loss = model(y1_inputs, y2_inputs)
