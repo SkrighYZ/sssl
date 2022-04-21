@@ -9,4 +9,4 @@ python finetune.py \
 	--decay_epochs 20 42 \
 	--weight_decay 1e-4 \
 	--eval_freq 5 \
-	--ckpt_dir ../models/iid_bt_b128
+	--ckpt_dir ../models/reservoir_sup_stm1_b128
