@@ -32,7 +32,6 @@ python main.py \
 # 	--weight_decay 1e-4 \
 # 	--print_freq 400 \
 # 	--save_freq 1 \
-# 	--projector 2048-2048 \
 # 	--num_classes 51 \
 # 	--save_dir ../models/instance_sup
 
@@ -49,6 +48,5 @@ python main.py \
 # 	--weight_decay 1e-4 \
 # 	--print_freq 400 \
 # 	--save_freq 1 \
-# 	--projector 2048-2048 \
 # 	--num_classes 51 \
 # 	--save_dir ../models/iid_sup
