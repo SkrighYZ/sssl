@@ -145,7 +145,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			else:
 				self.update_memory(t, curr_clip, update_ltm=True)
 
-			if t < 100:
+			if t < 40:
 				print(self.ltm_clip)
 				print(self.long_term_mem)
 
@@ -170,8 +170,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
 		self.batches[curr, :] = batch
 
-		#print(self.batches[:10, :])
-		#print(self.batches[90:100, :])
 
 	def update_memory(self, t, curr_clip, update_ltm=True):
 
@@ -179,30 +177,30 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		if update_ltm:
 			# Update long term memory
 			replace_idx = randint(0, t+1)
+
+			if self.use_boundary:
+				temp = self.ltm_clip + [curr_clip]
+				most_freq_clip = max(temp, key=temp.count)
+				if temp.count(most_freq_clip) > 1:
+					replace_idx = self.ltm_clip.index(most_freq_clip)
+
 			if replace_idx < len(self.long_term_mem):
-				if self.use_boundary:
-					temp = self.ltm_clip + [curr_clip]
-					most_freq_clip = max(temp, key=temp.count)
-					if temp.count(most_freq_clip) != 1:
-						replace_idx = self.ltm_clip.index(most_freq_clip)
 				self.long_term_mem[replace_idx] = t
 				self.ltm_clip[replace_idx] = curr_clip
 			replace_idx = randint(0, t+1)
 
 		# Update short term memory
 		replace_idx = randint(0, self.stm_span+1)
-		if replace_idx < len(self.short_term_mem):
-			if self.use_boundary:
-				temp = self.stm_clip + [curr_clip]
-				most_freq_clip = max(temp, key=temp.count)
-				if temp.count(most_freq_clip) != 1:
-					replace_idx = self.stm_clip.index(most_freq_clip)
-				elif np.max(self.stm_time_passed) > self.stm_span:
-					replace_idx = np.argmax(self.stm_time_passed)
 
-			elif np.max(self.stm_time_passed) > self.stm_span:
+		if self.use_boundary:
+			temp = self.stm_clip + [curr_clip]
+			most_freq_clip = max(temp, key=temp.count)
+			if temp.count(most_freq_clip) > 1:
+				replace_idx = self.stm_clip.index(most_freq_clip)
+
+		if replace_idx < len(self.short_term_mem):
+			if np.max(self.stm_time_passed) > self.stm_span:
 				replace_idx = np.argmax(self.stm_time_passed)
-				
 			self.short_term_mem[replace_idx] = t
 			self.stm_time_passed[replace_idx] = 0
 			self.stm_clip[replace_idx] = curr_clip
