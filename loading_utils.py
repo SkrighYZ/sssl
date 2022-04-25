@@ -145,6 +145,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			else:
 				self.update_memory(t, curr_clip, update_ltm=True)
 
+			print(self.ltm_clip)
+			print(self.long_term_mem)
+
 			if (t+1) % batch_size == 0:
 				rehearsal_idxs = self.long_term_mem + self.short_term_mem
 				if self.num_rehearsal_samples == len(rehearsal_idxs):
@@ -166,8 +169,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
 		self.batches[curr, :] = batch
 
-		print(self.batches[:10, :])
-		print(self.batches[90:100, :])
+		#print(self.batches[:10, :])
+		#print(self.batches[90:100, :])
 
 	def update_memory(self, t, curr_clip, update_ltm=True):
 
