@@ -145,7 +145,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			else:
 				self.update_memory(t, curr_clip, update_ltm=True)
 
-			if t < 40:
+			if t < 100:
 				print(self.ltm_clip)
 				print(self.long_term_mem)
 
@@ -182,7 +182,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 				temp = self.ltm_clip + [curr_clip]
 				most_freq_clip = max(temp, key=temp.count)
 				if temp.count(most_freq_clip) > 1:
-					replace_idx = self.ltm_clip.index(most_freq_clip)
+					replace_idx = random.choice([i for i, clip in enumerate(self.ltm_clip) if clip == most_freq_clip])
 
 			if replace_idx < len(self.long_term_mem):
 				self.long_term_mem[replace_idx] = t
@@ -196,7 +196,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			temp = self.stm_clip + [curr_clip]
 			most_freq_clip = max(temp, key=temp.count)
 			if temp.count(most_freq_clip) > 1:
-				replace_idx = self.stm_clip.index(most_freq_clip)
+				replace_idx = random.choice([i for i, clip in enumerate(self.stm_clip) if clip == most_freq_clip])
 
 		if replace_idx < len(self.short_term_mem):
 			if np.max(self.stm_time_passed) > self.stm_span:
