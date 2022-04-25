@@ -106,14 +106,15 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		return self.batches.shape[0]
 
 	def get_shot_bounds(self, shot_bounds, corrupt_rate):
-		self.shot_bounds = []
-		corrupt = binomial(1, corrupt_rate, len(shot_bounds))
+		self.shot_bounds = [1]
+		corrupt = binomial(1, corrupt_rate, len(shot_bounds)-1)
 		print(corrupt[:100])
-		for t in shot_bounds:
+
+		for b in shot_bounds[1:]:
 			if corrupt[t] == 1:
-				self.shot_bounds += [1-shot_bounds[t]]
+				self.shot_bounds += [1-b]
 			else:
-				self.shot_bounds += [shot_bounds[t]]
+				self.shot_bounds += [b]
 
 	def init_memory(self, ltm_size, stm_size):
 		self.long_term_mem = list(range(ltm_size))
