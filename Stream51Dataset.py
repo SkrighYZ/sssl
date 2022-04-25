@@ -60,8 +60,8 @@ class Stream51Dataset(data.Dataset):
         
         # First frames of each video clip
         self.shot_bounds = [1]
-        for i in range(1, len(samples)):
-            if samples[i][-3] != samples[i-1][-3] + 1:
+        for i in range(1, len(self.samples)):
+            if self.samples[i][-3] != self.samples[i-1][-3] + 1:
                 self.shot_bounds += [1]
             else:
                 self.shot_bounds += [0]
