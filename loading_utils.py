@@ -145,7 +145,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			else:
 				self.update_memory(t, curr_clip, update_ltm=True)
 
-			if t < 1000:
+			if t < 100:
 				print(self.ltm_clip)
 				print(self.long_term_mem)
 
