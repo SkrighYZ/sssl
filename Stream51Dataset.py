@@ -61,10 +61,11 @@ class Stream51Dataset(data.Dataset):
         # First frames of each video clip
         self.shot_bounds = [1]
         for i in range(1, len(self.samples)):
-            if self.samples[i][3] != (self.samples[i-1][3] + 1):
+            if self.samples[i][3] == 0:
                 self.shot_bounds += [1]
             else:
                 self.shot_bounds += [0]
+        print(self.shot_bounds[:100])
 
         self.ordering = ordering
 
