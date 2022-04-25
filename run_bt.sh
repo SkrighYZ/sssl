@@ -18,7 +18,8 @@ python main.py \
 	--save_freq 5 \
 	--projector 2048-2048 \
 	--save_dir ../models/reservoir_bound_bt_stm64_b128 \
-	--corrupt_rate 0.1
+	--corrupt_rate 0.1 \
+	--use_boundary
 
 # python main.py \
 #   --mode train \

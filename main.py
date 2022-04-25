@@ -141,6 +141,7 @@ def main():
 	parser.add_argument('--stm_size', type=int, default=128)
 	parser.add_argument('--stm_span', type=int, default=1000)
 
+	parser.add_argument("--use_boundary", action='store_true')
 	parser.add_argument('--corrupt_rate', type=float, default=0.1)
 
 	parser.add_argument('--epochs', type=int, default=5)

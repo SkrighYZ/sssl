@@ -79,7 +79,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	eligible for rehearsal.
 	"""
 
-	def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[], use_boundary=False, corrupt_rate=0.1):
+	def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[], use_boundary=False):
 		self.long_term_mem = long_term_mem  
 		self.short_term_mem = short_term_mem
 		self.stm_span = stm_span
@@ -212,7 +212,7 @@ def get_stream_data_loaders(args):
 		replay_sampler  = None
 		train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers, pin_memory=True)
 	else:
-		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, num_rehearsal_samples=args.batch_size)
+		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, num_rehearsal_samples=args.batch_size, use_boundary=args.use_boundary)
 		train_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
 	return dataset, train_loader, replay_sampler
