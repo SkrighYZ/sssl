@@ -108,6 +108,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	def get_shot_bounds(self, shot_bounds, corrupt_rate):
 		self.shot_bounds = []
 		corrupt = binomial(1, corrupt_rate, len(shot_bounds))
+		print(corrupt[:100])
 		for t in shot_bounds:
 			if corrupt[t] == 1:
 				self.shot_bounds += [1-shot_bounds[t]]

@@ -143,7 +143,6 @@ class Stream51Dataset(data.Dataset):
                     self.shot_bounds += [1]
                 else:
                     self.shot_bounds += [0]
-            print(self.shot_bounds[:100])
         else:
             raise ValueError('dataset ordering must be one of: "iid" or "instance"')
         
