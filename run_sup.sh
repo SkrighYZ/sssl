@@ -15,7 +15,7 @@ python main.py \
 	--lr_decay 1 \
 	--weight_decay 1e-4 \
 	--print_freq 400 \
-	--save_freq 1 \
+	--save_freq 5 \
 	--num_classes 51 \
 	--save_dir ../models/reservoir_sup
 

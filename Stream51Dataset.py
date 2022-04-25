@@ -57,6 +57,14 @@ class Stream51Dataset(data.Dataset):
         else:
             self.samples = json.load(open(os.path.join(root, 'Stream-51_meta_train.json')))
         self.targets = [s[0] for s in self.samples]
+        
+        # First frames of each video clip
+        self.shot_bounds = [1]
+        for i in range(1, len(samples)):
+            if samples[i][-3] != samples[i-1][-3] + 1:
+                self.shot_bounds += [1]
+            else:
+                self.shot_bounds += [0]
 
         self.ordering = ordering
 
@@ -112,7 +120,7 @@ class Stream51Dataset(data.Dataset):
 
     def shuffle(self):
         """
-        data_list
+        samples
         for train: [class_id, clip_num, video_num, frame_num, bbox, file_loc]
         for test: [class_id, bbox, file_loc]
         """
@@ -120,9 +128,21 @@ class Stream51Dataset(data.Dataset):
             # shuffle all data
             random.shuffle(self.samples)
             self.targets = [s[0] for s in self.samples]
+            self.shot_bounds = [1]
+            for i in range(1, len(samples)):
+                if samples[i][-3] != samples[i-1][-3] + 1:
+                    self.shot_bounds += [1]
+                else:
+                    self.shot_bounds += [0]
         elif self.ordering == 'instance':
             self.samples = instance_ordering(self.samples)
             self.targets = [s[0] for s in self.samples]
+            self.shot_bounds = [1]
+            for i in range(1, len(samples)):
+                if samples[i][-3] != samples[i-1][-3] + 1:
+                    self.shot_bounds += [1]
+                else:
+                    self.shot_bounds += [0]
         else:
             raise ValueError('dataset ordering must be one of: "iid" or "instance"')
         

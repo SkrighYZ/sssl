@@ -64,8 +64,11 @@ def train(args, model, device='cuda:0'):
 		dataset.shuffle()
 		if replay_sampler is not None:
 			print('Simulating batches...')
+			replay_sampler.get_shot_bounds(dataset.shot_bounds, args.corrupt_rate)
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
 			replay_sampler.simulate_batches(ltm_size=args.ltm_size, stm_size=args.stm_size, batch_size=args.batch_size, num_examples=len(dataset))
+
+			print(replay_sampler.shot_bounds)
 
 		loss_total = 0
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
@@ -132,13 +135,15 @@ def main():
 	parser.add_argument('--dataset', type=str, default='stream51', choices=['stream51'])
 	parser.add_argument('--num_classes', type=int, default=51)
 	parser.add_argument('--order', type=str, default='iid', choices=['iid', 'instance'])
-	parser.add_argument('--model', type=str, default='sliding_bt',
-						choices=['sliding_bt', 'reservoir_bt', 'sliding_supervised', 'reservoir_supervised'])
+	parser.add_argument('--model', type=str,
+						choices=['sliding_bt', 'reservoir_bt', 'reservoir_bound_bt', 'sliding_supervised', 'reservoir_supervised'])
 
 	parser.add_argument('--batch_size', type=int, default=256)
 	parser.add_argument('--ltm_size', type=int, default=128)
 	parser.add_argument('--stm_size', type=int, default=128)
 	parser.add_argument('--stm_span', type=int, default=1000)
+
+	parser.add_argument('--corrupt_rate', type=float, default=0.1)
 
 	parser.add_argument('--epochs', type=int, default=5)
 	parser.add_argument('--warmup_epochs', type=int, default=1)

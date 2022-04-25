@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.random import default_rng, randint
+from numpy.random import default_rng, randint, binomial
 import random
 import os
 from tqdm import tqdm
@@ -79,11 +79,19 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	eligible for rehearsal.
 	"""
 
-	def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[]):
+	def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[], use_boundary=False, corrupt_rate=0.1):
 		self.long_term_mem = long_term_mem  
 		self.short_term_mem = short_term_mem
-		self.stm_time_passed = None  # need to call init_memory()
 		self.stm_span = stm_span
+
+		# need to call init_memory()
+		self.ltm_clip = None
+		self.stm_clip = None
+		self.stm_time_passed = None  
+
+		# need to call get_shot_bounds()
+		self.use_boundary = use_boundary
+		self.shot_bounds = None
 
 		self.num_rehearsal_samples = num_rehearsal_samples
 		self.batches = None  # Need to call simulate_batches()
@@ -97,22 +105,44 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	def __len__(self):
 		return self.batches.shape[0]
 
+	def get_shot_bounds(self, shot_bounds, corrupt_rate):
+		self.shot_bounds = []
+		corrupt = binomial(1, corrupt_rate, len(shot_bounds))
+		for t in shot_bounds:
+			if corrupt[t] == 1:
+				self.shot_bounds += [1-shot_bounds[t]]
+			else:
+				self.shot_bounds += [shot_bounds[t]]
+
 	def init_memory(self, ltm_size, stm_size):
 		self.long_term_mem = list(range(ltm_size))
 		self.short_term_mem = list(range(stm_size))
 		self.stm_time_passed = np.arange(len(self.short_term_mem)-1, -1, -1)
 
+		self.ltm_clip = []
+		self.stm_clip = []
+		curr_clip = -1
+		for t in range(ltm_size):
+			if self.shot_bounds[t] == 1:
+				curr_clip += 1
+			if t < stm_size:
+				self.stm_clip += [curr_clip]
+			self.ltm_clip += [curr_clip]
+
+
 	def simulate_batches(self, ltm_size, stm_size, batch_size, num_examples):
 
 		self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
 		curr = 0
+		curr_clip = -1
 		for t in tqdm(range(num_examples)):
+			curr_clip += self.shot_bounds[t]
 			if t < stm_size:
 				continue
 			elif t < ltm_size:
-				self.update_memory(t, update_ltm=False)
+				self.update_memory(t, curr_clip, update_ltm=False)
 			else:
-				self.update_memory(t, update_ltm=True)
+				self.update_memory(t, curr_clip, update_ltm=True)
 
 			if (t+1) % batch_size == 0:
 				rehearsal_idxs = self.long_term_mem + self.short_term_mem
@@ -135,22 +165,29 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
 		self.batches[curr, :] = batch
 
-	def update_memory(self, t, update_ltm=True):
+	def update_memory(self, t, curr_clip, update_ltm=True):
+
 		# Assume long term memory is larger
 		if update_ltm:
 			# Update long term memory
 			replace_idx = randint(0, t+1)
 			if replace_idx < len(self.long_term_mem):
+				if self.use_boundary and curr_clip in self.ltm_clip:
+					replace_idx = self.ltm_clip.index(curr_clip)
 				self.long_term_mem[replace_idx] = t
+				self.ltm_clip[replace_idx] = curr_clip
 			replace_idx = randint(0, t+1)
 
 		# Update short term memory
 		replace_idx = randint(0, self.stm_span+1)
 		if replace_idx < len(self.short_term_mem):
-			if np.max(self.stm_time_passed) > self.stm_span:
+			if self.use_boundary and curr_clip in self.stm_clip:
+				replace_idx = self.stm_clip.index(curr_clip)
+			elif np.max(self.stm_time_passed) > self.stm_span:
 				replace_idx = np.argmax(self.stm_time_passed)
 			self.short_term_mem[replace_idx] = t
 			self.stm_time_passed[replace_idx] = 0
+			self.stm_clip[replace_idx] = curr_clip
 		self.stm_time_passed += 1
 
 
