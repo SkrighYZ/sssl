@@ -199,8 +199,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 				replace_idx = random.choice([i for i, clip in enumerate(self.stm_clip) if clip == most_freq_clip])
 
 		if replace_idx < len(self.short_term_mem):
-			if np.max(self.stm_time_passed) > self.stm_span:
-				replace_idx = np.argmax(self.stm_time_passed)
+			# if np.max(self.stm_time_passed) > self.stm_span:
+			# 	replace_idx = np.argmax(self.stm_time_passed)
 			self.short_term_mem[replace_idx] = t
 			self.stm_time_passed[replace_idx] = 0
 			self.stm_clip[replace_idx] = curr_clip
