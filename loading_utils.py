@@ -145,8 +145,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			else:
 				self.update_memory(t, curr_clip, update_ltm=True)
 
-			print(self.ltm_clip)
-			print(self.long_term_mem)
+			if t < 1000:
+				print(self.ltm_clip)
+				print(self.long_term_mem)
 
 			if (t+1) % batch_size == 0:
 				rehearsal_idxs = self.long_term_mem + self.short_term_mem
