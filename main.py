@@ -68,7 +68,7 @@ def train(args, model, device='cuda:0'):
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
 			replay_sampler.simulate_batches(ltm_size=args.ltm_size, stm_size=args.stm_size, batch_size=args.batch_size, num_examples=len(dataset))
 
-			print(replay_sampler.shot_bounds)
+			print(replay_sampler.shot_bounds[:100])
 
 		loss_total = 0
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
