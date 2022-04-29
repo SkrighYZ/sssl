@@ -66,7 +66,12 @@ def train(args, model, device='cuda:0'):
 			print('Simulating batches...')
 			replay_sampler.get_shot_bounds(dataset.shot_bounds, args.corrupt_rate)
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
-			replay_sampler.simulate_batches(ltm_size=args.ltm_size, stm_size=args.stm_size, batch_size=args.batch_size, num_examples=len(dataset))
+			replay_sampler.simulate_batches(batch_size=args.batch_size, num_examples=len(dataset))
+
+			if epoch == 0:
+				pickle.dump(dataset.samples, open(args.save_dir / 'samples.pkl', 'rb'))
+				pickle.dump(replay_sampler.stm_batches, open(args.save_dir / 'stm_batches.pkl', 'rb'))
+				pickle.dump(replay_sampler.ltm_batches, open(args.save_dir / 'ltm_batches.pkl', 'rb'))
 
 		loss_total = 0
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):

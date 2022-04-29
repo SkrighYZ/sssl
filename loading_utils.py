@@ -96,6 +96,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.num_rehearsal_samples = num_rehearsal_samples
 		self.batches = None  # Need to call simulate_batches()
 
+		self.stm_batches = None
+		self.ltm_batches = None
+
 		self.rng = default_rng(seed=os.getpid())
 
 	def __iter__(self):
@@ -131,16 +134,21 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.ltm_clip += [curr_clip]
 
 
-	def simulate_batches(self, ltm_size, stm_size, batch_size, num_examples):
+	def simulate_batches(self, batch_size, num_examples):
 
 		self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
+
+		# For distribution
+		self.ltm_batches = np.zeros((num_examples//batch_size+1, self.num_rehearsal_samples-len(self.short_term_mem)), dtype=int)
+		self.stm_batches = np.zeros((num_examples//batch_size+1, len(self.short_term_mem)), dtype=int)
+
 		curr = 0
 		curr_clip = -1
 		for t in tqdm(range(num_examples)):
 			curr_clip += self.shot_bounds[t]
-			if t < stm_size:
+			if t < len(self.short_term_mem):
 				continue
-			elif t < ltm_size:
+			elif t < len(self.long_term_mem):
 				self.update_memory(t, curr_clip, update_ltm=False)
 			else:
 				self.update_memory(t, curr_clip, update_ltm=True)
@@ -153,6 +161,10 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					# Use all samples in stm and randomly select samples in ltm
 					ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples-len(self.short_term_mem), replace=False)
 					batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)	   
+
+					self.ltm_batches[curr, :] = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix])
+					self.stm_batches[curr, :] = np.array(self.short_term_mem)
+
 				self.batches[curr, :] = batch
 				curr += 1
 		
@@ -164,6 +176,10 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			# Use all samples in stm and randomly select samples in ltm
 			ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples-len(self.short_term_mem), replace=False)
 			batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
+
+			self.ltm_batches[curr, :] = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix])
+			self.stm_batches[curr, :] = np.array(self.short_term_mem)
+
 		self.batches[curr, :] = batch
 
 
