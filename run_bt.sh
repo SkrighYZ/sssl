@@ -17,9 +17,9 @@ python main.py \
 	--print_freq 400 \
 	--save_freq 5 \
 	--projector 2048-2048 \
-	--save_dir ../models/inspect_bound_stm64_b128 \
-	--corrupt_rate 0.1 \
-	--use_boundary
+	--save_dir ../models/inspect_stm64_b128 \
+	--corrupt_rate 0.1 
+#	--use_boundary
 
 # python main.py \
 #   --mode train \
