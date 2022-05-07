@@ -23,24 +23,24 @@ class LegacyRehearsalBatchSampler(torch.utils.data.Sampler):
 	iterator object.
 	"""
 
-	def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[]):
+	def __init__(self, stm_span, batch_size, long_term_mem=[], short_term_mem=[]):
 		self.long_term_mem = long_term_mem  
 		self.short_term_mem = short_term_mem
 		self.stm_time_passed = None  # need to call init_memory()
 		self.stm_span = stm_span
 
-		self.num_rehearsal_samples = num_rehearsal_samples
+		self.batch_size = batch_size
 
 		self.rng = default_rng(seed=os.getpid())
 
 	def __iter__(self):
 		while True:
 			rehearsal_idxs = self.long_term_mem + self.short_term_mem
-			if self.num_rehearsal_samples == len(rehearsal_idxs):
+			if self.batch_size == len(rehearsal_idxs):
 				#print(rehearsal_idxs)
 				yield np.array(rehearsal_idxs)
 			else:
-				ix = self.rng.choice(len(rehearsal_idxs), self.num_rehearsal_samples, replace=False)
+				ix = self.rng.choice(len(rehearsal_idxs), self.batch_size, replace=False)
 				yield np.array([rehearsal_idxs[_curr_ix] for _curr_ix in ix])
 
 	def __len__(self):
@@ -79,7 +79,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	eligible for rehearsal.
 	"""
 
-	def __init__(self, stm_span, num_rehearsal_samples, long_term_mem=[], short_term_mem=[], use_boundary=False):
+	def __init__(self, stm_span, batch_size, stm_batch_size, use_boundary=False):
 		self.long_term_mem = long_term_mem  
 		self.short_term_mem = short_term_mem
 		self.stm_span = stm_span
@@ -93,7 +93,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.use_boundary = use_boundary
 		self.shot_bounds = None
 
-		self.num_rehearsal_samples = num_rehearsal_samples
 		self.batches = None  # Need to call simulate_batches()
 
 		self.stm_batches = None
@@ -134,13 +133,13 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.ltm_clip += [curr_clip]
 
 
-	def simulate_batches(self, batch_size, num_examples):
+	def simulate_batches(self, batch_size, stm_batch_size, num_examples):
 
 		self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
 
 		# For distribution
-		self.ltm_batches = np.zeros((num_examples//batch_size+1, self.num_rehearsal_samples-len(self.short_term_mem)), dtype=int)
-		self.stm_batches = np.zeros((num_examples//batch_size+1, len(self.short_term_mem)), dtype=int)
+		self.ltm_batches = np.zeros((num_examples//batch_size+1, batch_size-stm_batch_size), dtype=int)
+		self.stm_batches = np.zeros((num_examples//batch_size+1, stm_batch_size), dtype=int)
 
 		curr = 0
 		curr_clip = -1
@@ -155,32 +154,32 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
 			if (t+1) % batch_size == 0:
 				rehearsal_idxs = self.long_term_mem + self.short_term_mem
-				if self.num_rehearsal_samples == len(rehearsal_idxs):
-					batch = np.array(rehearsal_idxs)
-				else:
-					# Use all samples in stm and randomly select samples in ltm
-					ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples-len(self.short_term_mem), replace=False)
-					batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)	   
-
-					self.ltm_batches[curr, :] = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix])
+				if batch_size == len(rehearsal_idxs):
+					self.ltm_batches[curr, :] = np.array(self.long_term_mem)
 					self.stm_batches[curr, :] = np.array(self.short_term_mem)
+				else:
+					ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
+					stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 
-				self.batches[curr, :] = batch
+					self.ltm_batches[curr, :] = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ltm_ix])
+					self.stm_batches[curr, :] = np.array([self.short_term_mem[_curr_ix] for _curr_ix in stm_ix])
+
+				self.batches[curr, :] = np.concatenate([self.ltm_batches[curr, :], self.stm_batches[curr, :]])
 				curr += 1
 		
 		# Last batch
 		rehearsal_idxs = self.long_term_mem + self.short_term_mem
-		if self.num_rehearsal_samples == len(rehearsal_idxs):
-			batch = np.array(rehearsal_idxs)
-		else:
-			# Use all samples in stm and randomly select samples in ltm
-			ix = self.rng.choice(len(self.long_term_mem), self.num_rehearsal_samples-len(self.short_term_mem), replace=False)
-			batch = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix] + self.short_term_mem)
-
-			self.ltm_batches[curr, :] = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ix])
+		if batch_size == len(rehearsal_idxs):
+			self.ltm_batches[curr, :] = np.array(self.long_term_mem)
 			self.stm_batches[curr, :] = np.array(self.short_term_mem)
+		else:
+			ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
+			stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 
-		self.batches[curr, :] = batch
+			self.ltm_batches[curr, :] = np.array([self.long_term_mem[_curr_ix] for _curr_ix in ltm_ix])
+			self.stm_batches[curr, :] = np.array([self.short_term_mem[_curr_ix] for _curr_ix in stm_ix])
+
+		self.batches[curr, :] = np.concatenate([self.ltm_batches[curr, :], self.stm_batches[curr, :]])
 
 
 	def update_memory(self, t, curr_clip, update_ltm=True):
@@ -236,7 +235,7 @@ def get_stream_data_loaders(args):
 		replay_sampler  = None
 		train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers, pin_memory=True)
 	else:
-		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, num_rehearsal_samples=args.batch_size, use_boundary=args.use_boundary)
+		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, use_boundary=args.use_boundary)
 		train_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
 	return dataset, train_loader, replay_sampler

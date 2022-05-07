@@ -66,7 +66,7 @@ def train(args, model, device='cuda:0'):
 			print('Simulating batches...')
 			replay_sampler.get_shot_bounds(dataset.shot_bounds, args.corrupt_rate)
 			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
-			replay_sampler.simulate_batches(batch_size=args.batch_size, num_examples=len(dataset))
+			replay_sampler.simulate_batches(batch_size=args.batch_size, stm_batch_size=args.stm_batch_size, num_examples=len(dataset))
 
 			if epoch == 0:
 				pickle.dump(dataset.samples, open(args.save_dir / 'samples.pkl', 'wb'))
@@ -142,6 +142,7 @@ def main():
 						choices=['sliding_bt', 'reservoir_bt', 'reservoir_bound_bt', 'sliding_supervised', 'reservoir_supervised'])
 
 	parser.add_argument('--batch_size', type=int, default=256)
+	parser.add_argument('--stm_batch_size', type=int, default=64)
 	parser.add_argument('--ltm_size', type=int, default=128)
 	parser.add_argument('--stm_size', type=int, default=128)
 	parser.add_argument('--stm_span', type=int, default=1000)
@@ -168,6 +169,7 @@ def main():
 	parser.add_argument('--save_dir', type=Path, metavar='DIR')
 
 	args = parser.parse_args()
+
 	print(args)
 
 	if not os.path.exists(args.save_dir):
