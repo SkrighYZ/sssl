@@ -4,7 +4,7 @@
 python main.py \
 	--mode train \
 	--order instance \
-	--model reservoir_bound_bt \
+	--model reservoir_bt \
 	--ltm_size 128 \
 	--stm_size 128 \
 	--stm_span 10 \

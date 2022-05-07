@@ -139,7 +139,7 @@ def main():
 	parser.add_argument('--num_classes', type=int, default=51)
 	parser.add_argument('--order', type=str, default='iid', choices=['iid', 'instance'])
 	parser.add_argument('--model', type=str,
-						choices=['sliding_bt', 'reservoir_bt', 'reservoir_bound_bt', 'sliding_supervised', 'reservoir_supervised'])
+						choices=['sliding_bt', 'reservoir_bt', 'sliding_supervised', 'reservoir_supervised'])
 
 	parser.add_argument('--batch_size', type=int, default=256)
 	parser.add_argument('--stm_batch_size', type=int, default=64)
