@@ -5,11 +5,11 @@ python main.py \
 	--mode train \
 	--order instance \
 	--model reservoir_bound_bt \
-	--ltm_size 4 \
-	--stm_size 4 \
+	--ltm_size 128 \
+	--stm_size 128 \
 	--stm_span 10 \
-	--batch_size 4 \
-	--stm_batch_size 2 \
+	--batch_size 128 \
+	--stm_batch_size 64 \
 	--epochs 10 \
 	--warmup_epochs 1 \
 	--learning_rate_weights 0.15 \
