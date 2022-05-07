@@ -80,7 +80,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	"""
 
 	def __init__(self, stm_span, use_boundary=False):
-		
+
 		self.stm_span = stm_span
 
 		# need to call init_memory()
@@ -181,6 +181,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.stm_batches[curr, :] = np.array([self.short_term_mem[_curr_ix] for _curr_ix in stm_ix])
 
 		self.batches[curr, :] = np.concatenate([self.ltm_batches[curr, :], self.stm_batches[curr, :]])
+		print(curr, batches[curr, :])
 
 
 	def update_memory(self, t, curr_clip, update_ltm=True):
