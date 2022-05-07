@@ -79,7 +79,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	eligible for rehearsal.
 	"""
 
-	def __init__(self, stm_span, batch_size, stm_batch_size, use_boundary=False):
+	def __init__(self, stm_span, use_boundary=False):
 		self.long_term_mem = long_term_mem  
 		self.short_term_mem = short_term_mem
 		self.stm_span = stm_span
