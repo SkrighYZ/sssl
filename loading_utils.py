@@ -80,13 +80,14 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	"""
 
 	def __init__(self, stm_span, use_boundary=False):
-		self.long_term_mem = long_term_mem  
-		self.short_term_mem = short_term_mem
+		
 		self.stm_span = stm_span
 
 		# need to call init_memory()
 		self.ltm_clip = None
 		self.stm_clip = None
+		self.long_term_mem = None
+		self.short_term_mem = None
 		self.stm_time_passed = None  
 
 		# need to call get_shot_bounds()
