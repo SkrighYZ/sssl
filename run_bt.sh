@@ -5,11 +5,11 @@ python main.py \
 	--mode train \
 	--order instance \
 	--model reservoir_bound_bt \
-	--ltm_size 128 \
-	--stm_size 128 \
-	--stm_span 1500 \
-	--batch_size 128 \
-	--stm_batch_size 64 \
+	--ltm_size 4 \
+	--stm_size 4 \
+	--stm_span 10 \
+	--batch_size 4 \
+	--stm_batch_size 2 \
 	--epochs 10 \
 	--warmup_epochs 1 \
 	--learning_rate_weights 0.15 \
@@ -18,7 +18,7 @@ python main.py \
 	--print_freq 400 \
 	--save_freq 5 \
 	--projector 2048-2048 \
-	--save_dir ../models/ins_bt_s128_l128_b128_sb64 \
+	--save_dir ../models/rb_bt_s128_l128_b128_sb64 \
 	--corrupt_rate 0.1 \
 	--use_boundary
 
