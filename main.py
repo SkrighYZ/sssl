@@ -61,11 +61,11 @@ def train(args, model, device='cuda:0'):
 	
 	for epoch in range(start_epoch, args.epochs):
 
-		dataset.shuffle()
+		ex2ex_mapping = dataset.shuffle()
 		if replay_sampler is not None:
 			print('Simulating batches...')
 			replay_sampler.get_shot_bounds(dataset.shot_bounds, args.corrupt_rate)
-			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size)
+			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size, ex2ex_mapping=ex2ex_mapping)
 			replay_sampler.simulate_batches(batch_size=args.batch_size, stm_batch_size=args.stm_batch_size, num_examples=len(dataset))
 
 			if epoch == 0:

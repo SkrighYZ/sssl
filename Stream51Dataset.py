@@ -11,23 +11,37 @@ def instance_ordering(data_list):
     total_videos = 0
     new_data_list = []
     temp_video = []
-    for x in data_list:
+    v2ex_mapping = []
+    temp_video_idx = []
+    for x_i, x in enumerate(data_list):
         if x[3] == 0:
             new_data_list.append(temp_video)
-            total_videos += 1
             temp_video = [x]
+            v2ex_mapping.append(temp_video_idx)
+            temp_video_idx = [x_i]
+            total_videos += 1
         else:
             temp_video.append(x)
+            temp_video_idx.append(x_i)
     new_data_list.append(temp_video)
     new_data_list = new_data_list[1:]
+    v2ex_mapping.append(temp_video_idx)
+    v2ex_mapping = v2ex_mapping[1:]
+    
     # shuffle videos
-    random.shuffle(new_data_list)
+    v2v_mapping = list(range(new_data_list))
+    random.shuffle(v2v_mapping)
+    new_data_list = [new_data_list[i] for i in v2v_mapping]
+    
     # reorganize by clip
     data_list = []
-    for v in new_data_list:
-        for x in v:
+    ex2ex_mapping = []
+    for v_i, v in enumerate(new_data_list):
+        for x_i, x in enumerate(v):
             data_list.append(x)
-    return data_list
+            ex2ex_mapping.append(v2ex_mapping[v2v_mapping[v_i]][x_i])
+
+    return data_list, ex2ex_mapping
 
 
 class Stream51Dataset(data.Dataset):
@@ -124,6 +138,7 @@ class Stream51Dataset(data.Dataset):
         for train: [class_id, clip_num, video_num, frame_num, bbox, file_loc]
         for test: [class_id, bbox, file_loc]
         """
+        ex2ex_mapping = None
         if self.ordering == 'iid':
             # shuffle all data
             random.shuffle(self.samples)
@@ -135,7 +150,7 @@ class Stream51Dataset(data.Dataset):
                 else:
                     self.shot_bounds += [0]
         elif self.ordering == 'instance':
-            self.samples = instance_ordering(self.samples)
+            self.samples, ex2ex_mapping = instance_ordering(self.samples)
             self.targets = [s[0] for s in self.samples]
             self.shot_bounds = []
             for i in range(len(self.samples)):
@@ -145,8 +160,8 @@ class Stream51Dataset(data.Dataset):
                     self.shot_bounds += [0]
         else:
             raise ValueError('dataset ordering must be one of: "iid" or "instance"')
-        
-        return
+
+        return ex2ex_mapping
 
 
 def pil_loader(path):

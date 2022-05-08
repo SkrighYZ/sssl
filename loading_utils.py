@@ -118,20 +118,30 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			else:
 				self.shot_bounds += [shot_bounds[t]]
 
-	def init_memory(self, ltm_size, stm_size):
-		self.long_term_mem = list(range(ltm_size))
-		self.short_term_mem = list(range(stm_size))
+	def init_memory(self, ltm_size, stm_size, ex2ex_mapping):
+		if self.long_term_mem is None:
+			self.long_term_mem = list(range(ltm_size))
+			self.short_term_mem = list(range(stm_size))
+		else:
+			self.long_term_mem = [ex2ex_mapping[_idx] for idx in self.long_term_mem]
+			self.short_term_mem = [ex2ex_mapping[_idx] for idx in self.short_term_mem]
+
 		self.stm_time_passed = np.arange(len(self.short_term_mem)-1, -1, -1)
 
-		self.ltm_clip = []
-		self.stm_clip = []
-		curr_clip = -1
-		for t in range(ltm_size):
-			if self.shot_bounds[t] == 1:
-				curr_clip += 1
-			if t < stm_size:
-				self.stm_clip += [curr_clip]
-			self.ltm_clip += [curr_clip]
+		if self.ltm_clip is None:
+			self.ltm_clip = []
+			self.stm_clip = []
+			curr_clip = -1
+			for t in range(ltm_size):
+				if self.shot_bounds[t] == 1:
+					curr_clip += 1
+				if t < stm_size:
+					self.stm_clip += [curr_clip]
+				self.ltm_clip += [curr_clip]
+		else:
+			# Treat all samples from last epoch as from different clips as the ones in the new epoch
+			self.ltm_clip = [min(c, -c) for c in self.ltm_clip]
+			self.stm_clip = [min(c, -c) for c in self.stm_clip]
 
 
 	def simulate_batches(self, batch_size, stm_batch_size, num_examples):
