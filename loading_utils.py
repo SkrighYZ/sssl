@@ -123,8 +123,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.long_term_mem = list(range(ltm_size))
 			self.short_term_mem = list(range(stm_size))
 		else:
-			self.long_term_mem = [ex2ex_mapping[_idx] for idx in self.long_term_mem]
-			self.short_term_mem = [ex2ex_mapping[_idx] for idx in self.short_term_mem]
+			self.long_term_mem = [ex2ex_mapping[_idx] for _idx in self.long_term_mem]
+			self.short_term_mem = [ex2ex_mapping[_idx] for _idx in self.short_term_mem]
 
 		self.stm_time_passed = np.arange(len(self.short_term_mem)-1, -1, -1)
 

@@ -11,7 +11,7 @@ def instance_ordering(data_list):
     total_videos = 0
     new_data_list = []
     temp_video = []
-    v2ex_mapping = []
+    v2ex_mapping = []   # old video index (idx) to old example index list (val) mapping
     temp_video_idx = []
     for x_i, x in enumerate(data_list):
         if x[3] == 0:
@@ -29,7 +29,7 @@ def instance_ordering(data_list):
     v2ex_mapping = v2ex_mapping[1:]
     
     # shuffle videos
-    v2v_mapping = list(range(len(new_data_list)))
+    v2v_mapping = list(range(len(new_data_list)))       # new (idx) to old (val) video mapping
     random.shuffle(v2v_mapping)
     new_data_list = [new_data_list[i] for i in v2v_mapping]
     
