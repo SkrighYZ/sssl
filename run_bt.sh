@@ -7,7 +7,7 @@ python main.py \
 	--model reservoir_bt \
 	--ltm_size 128 \
 	--stm_size 128 \
-	--stm_span 10 \
+	--stm_span 1500 \
 	--batch_size 128 \
 	--stm_batch_size 64 \
 	--epochs 10 \

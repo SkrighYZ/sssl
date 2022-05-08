@@ -144,7 +144,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.stm_clip = [min(c, -c) for c in self.stm_clip]
 
 
-	def simulate_batches(self, batch_size, stm_batch_size, num_examples):
+	def simulate_batches(self, batch_size, stm_batch_size, num_examples, epoch):
 
 		self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
 
@@ -156,12 +156,13 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		curr_clip = -1
 		for t in tqdm(range(num_examples)):
 			curr_clip += self.shot_bounds[t]
-			if t < len(self.short_term_mem):
-				pass
-			elif t < len(self.long_term_mem):
-				self.update_memory(t, curr_clip, update_ltm=False)
-			else:
-				self.update_memory(t, curr_clip, update_ltm=True)
+			if epoch == 0:
+				if t < len(self.short_term_mem):
+					pass
+				elif t < len(self.long_term_mem):
+					self.update_memory(t, curr_clip, update_ltm=False)
+				else:
+					self.update_memory(t, curr_clip, update_ltm=True)
 
 			if (t+1) % batch_size == 0:
 				rehearsal_idxs = self.long_term_mem + self.short_term_mem
