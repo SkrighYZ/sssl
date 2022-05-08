@@ -19,8 +19,8 @@ python main.py \
 	--save_freq 5 \
 	--projector 2048-2048 \
 	--save_dir ../models/r_bt_s128_l128_b128_sb64 \
-	--corrupt_rate 0.1 
-#	--use_boundary
+	--corrupt_rate 0.1 \
+	--use_boundary
 
 # python main.py \
 #   --mode train \
