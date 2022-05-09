@@ -247,7 +247,8 @@ def get_stream_data_loaders(args):
 
 	if 'sliding' in args.model:
 		replay_sampler  = None
-		train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=shuffle, num_workers=args.num_workers, pin_memory=True)
+		drop_last = True if args.model == 'sliding_simclr' else False
+		train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=shuffle, drop_last=drop_last, num_workers=args.num_workers, pin_memory=True)
 	else:
 		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, use_boundary=args.use_boundary)
 		train_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.num_workers, pin_memory=True)

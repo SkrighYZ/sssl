@@ -75,9 +75,6 @@ def train(args, model, device='cuda:0'):
 		loss_total = 0
 		for step, (y, labels) in enumerate(train_loader):
 
-			if step == len(train_loader) and args.model == 'sliding_simclr':
-				break
-
 			if 'supervised' in args.model:
 				inputs = y.cuda(non_blocking=True)
 				targets = labels.cuda(non_blocking=True)
@@ -85,8 +82,6 @@ def train(args, model, device='cuda:0'):
 				y1, y2 = y
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
-
-				print(step, y1.size())
 
 			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
@@ -147,11 +142,11 @@ def main():
 								'sliding_simclr', 'reservoir_simclr', 
 								'sliding_supervised', 'reservoir_supervised'])
 
-	parser.add_argument('--batch_size', type=int, default=256)
+	parser.add_argument('--batch_size', type=int, default=128)
 	parser.add_argument('--stm_batch_size', type=int, default=64)
 	parser.add_argument('--ltm_size', type=int, default=128)
 	parser.add_argument('--stm_size', type=int, default=128)
-	parser.add_argument('--stm_span', type=int, default=1000)
+	parser.add_argument('--stm_span', type=int, default=1500)
 
 	parser.add_argument("--use_boundary", action='store_true')
 	parser.add_argument('--corrupt_rate', type=float, default=0.1)
