@@ -122,7 +122,7 @@ class SimCLR(nn.Module):
         z1 = self.projector(self.backbone(y1))
         z2 = self.projector(self.backbone(y2))
 
-        loss = criterion(z1, z2)
+        loss = self.criterion(z1, z2)
         return loss
 
 
