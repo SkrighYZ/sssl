@@ -26,41 +26,52 @@ class_labels = [s[0] for s in samples]
 stm_sample_dist = []
 stm_class_dist = []
 stm_clip_dist = []
-
 stm_class_per_batch = []
 stm_clip_per_batch = []
-for b in stm_batches:
-	class_batch = set()
-	clip_batch = set()
-	for i in b:
-		stm_sample_dist.append(i)
-		stm_class_dist.append(class_labels[i])
-		stm_clip_dist.append(clip_labels[i])
-
-		class_batch.add(class_labels[i])
-		clip_batch.add(clip_labels[i])
-
-	stm_class_per_batch.append(len(class_batch))
-	stm_clip_per_batch.append(len(clip_batch))
 
 ltm_sample_dist = []
 ltm_class_dist = []
 ltm_clip_dist = []
 ltm_class_per_batch = []
 ltm_clip_per_batch = []
-for b in ltm_batches:
-	class_batch = set()
-	clip_batch = set()
-	for i in b:
+
+total_class_per_batch = []
+total_clip_per_batch = []
+
+for b_i in range(len(stm_batches)):
+
+	stm_class_batch = set()
+	stm_clip_batch = set()
+	for i in stm_batches[b_i]:
+		stm_sample_dist.append(i)
+		stm_class_dist.append(class_labels[i])
+		stm_clip_dist.append(clip_labels[i])
+
+		stm_class_batch.add(class_labels[i])
+		stm_clip_batch.add(clip_labels[i])
+
+	stm_class_per_batch.append(len(stm_class_batch))
+	stm_clip_per_batch.append(len(stm_clip_batch))
+
+	ltm_class_batch = set()
+	ltm_clip_batch = set()
+	for i in ltm_batches[b_i]:
 		ltm_sample_dist.append(i)
 		ltm_class_dist.append(class_labels[i])
 		ltm_clip_dist.append(clip_labels[i])
 
-		class_batch.add(class_labels[i])
-		clip_batch.add(clip_labels[i])
+		ltm_class_batch.add(class_labels[i])
+		ltm_clip_batch.add(clip_labels[i])
 
-	ltm_class_per_batch.append(len(class_batch))
-	ltm_clip_per_batch.append(len(clip_batch))
+	ltm_class_per_batch.append(len(ltm_class_batch))
+	ltm_clip_per_batch.append(len(ltm_clip_batch))
+
+	total_class_batch = stm_class_batch.union(ltm_class_batch)
+	total_clip_batch = stm_clip_batch.union(ltm_clip_batch)
+	total_class_per_batch.append(len(total_class_batch))
+	total_clip_per_batch.append(len(total_clip_batch))
+
+
 
 
 # bins = np.linspace(0, 50, 51)
@@ -86,22 +97,26 @@ for b in ltm_batches:
 
 plt.plot(ltm_class_per_batch, label='LTM')
 plt.plot(stm_class_per_batch, label='STM')
+plt.plot(total_class_per_batch, label='Total')
 optimal = [51] * len(ltm_class_per_batch)
 plt.plot(optimal, ls='--', label='optimal')
 plt.ylim((0, 55))
 plt.ylabel('Num Classes Within Batch')
 plt.xlabel('Step')
 plt.legend()
+plt.gcf().set_size_inches(5, 5, forward=True)
 plt.show()
 
 plt.plot(ltm_clip_per_batch, label='LTM')
 plt.plot(stm_clip_per_batch, label='STM')
-optimal = [64] * len(ltm_clip_per_batch)
+plt.plot(total_clip_per_batch, label='Total')
+optimal = [128] * len(ltm_clip_per_batch)
 plt.plot(optimal, ls='--', label='optimal')
-plt.ylim((0, 70))
+plt.ylim((0, 130))
 plt.ylabel('Num Clips Within Batch')
 plt.xlabel('Step')
 plt.legend()
+plt.gcf().set_size_inches(5, 5, forward=True)
 plt.show()
 
 

@@ -125,6 +125,8 @@ class SimCLR(nn.Module):
         loss = criterion(z1, z2)
         return loss
 
+
+
 class ResNet18(nn.Module):
     def __init__(self, args):
         super().__init__()
