@@ -73,7 +73,7 @@ def train(args, model, device='cuda:0'):
 				pickle.dump(replay_sampler.ltm_batches, open(args.save_dir / 'ltm_batches.pkl', 'wb'))
 
 		loss_total = 0
-		for step, (y, labels) in enumerate(train_loader):
+		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
 
 			if 'supervised' in args.model:
 				inputs = y.cuda(non_blocking=True)
