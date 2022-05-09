@@ -24,7 +24,7 @@ def prepare_model(args):
 
 	if 'random' in str(args.ckpt_dir):
 		pass
-	elif 'bt' in str(args.ckpt_dir):
+	elif 'bt' in str(args.ckpt_dir) or 'simclr' in str(args.ckpt_dir):
 		model.fc = nn.Identity()
 		ckpt = torch.load(args.ckpt_dir / 'resnet18.pth', map_location='cpu')
 		model.load_state_dict(ckpt)

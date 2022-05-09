@@ -55,11 +55,10 @@ def train(args, model, device='cuda:0'):
 
 	model.train()
 	start_time = time.time()
-	start_epoch = 0
 
 	loss_logs = []
 	
-	for epoch in range(start_epoch, args.epochs):
+	for epoch in range(args.epochs):
 
 		ex2ex_mapping = dataset.shuffle()
 		if replay_sampler is not None:
@@ -74,7 +73,10 @@ def train(args, model, device='cuda:0'):
 				pickle.dump(replay_sampler.ltm_batches, open(args.save_dir / 'ltm_batches.pkl', 'wb'))
 
 		loss_total = 0
-		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
+		for step, (y, labels) in enumerate(train_loader):
+
+			if step == len(train_loader) and args.model == 'sliding_simclr':
+				break
 
 			if 'supervised' in args.model:
 				inputs = y.cuda(non_blocking=True)
