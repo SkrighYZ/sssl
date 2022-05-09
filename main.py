@@ -183,6 +183,8 @@ def main():
 
 	if 'bt' in args.model:
 		model = BarlowTwins(args)
+	elif 'simclr' in args.model:
+		model = SimCLR(args)
 	elif 'supervised' in args.model:
 		model = ResNet18(args)
 	else:
