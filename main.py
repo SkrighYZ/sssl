@@ -86,6 +86,8 @@ def train(args, model, device='cuda:0'):
 				y1_inputs = y1.cuda(non_blocking=True)
 				y2_inputs = y2.cuda(non_blocking=True)
 
+				print(step, y1.size())
+
 			adjust_learning_rate(args, optimizer, train_loader, step)
 			optimizer.zero_grad()
 
