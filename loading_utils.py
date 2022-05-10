@@ -189,8 +189,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 							stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
 							stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, stm_indices))][:stm_batch_size]
 
-						replay_count[self.long_term_mem[ltm_ix]] += 1
-						replay_count[self.short_term_mem[stm_ix]] += 1
+						replay_count[[self.long_term_mem[_idx] for _idx in ltm_ix]] += 1
+						replay_count[[self.short_term_mem[_idx] for _idx in stm_ix]] += 1
 
 					else:
 						ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
