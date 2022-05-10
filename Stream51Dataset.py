@@ -64,7 +64,7 @@ class Stream51Dataset(data.Dataset):
         targets (list): The class_index value for each image in the dataset
     """
 
-    def __init__(self, root, test=False, ordering, transform, mixup=False, alpha=2, bbox_crop=True, ratio=1.10):
+    def __init__(self, root, ordering, transform, test=False, mixup=False, alpha=2, bbox_crop=True, ratio=1.10):
 
         if test:
             self.samples = json.load(open(os.path.join(root, 'Stream-51_meta_test.json')))
