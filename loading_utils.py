@@ -184,7 +184,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 							stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 						else:
 							ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
-							ltm_idx = [_idx for _, _idx in sorted(zip(ltm_replay_count, self.long_term_mem))][:batch_size-stm_batch_size] 		
+							ltm_idx = [_idx for _, _idx in sorted(zip(ltm_replay_count, self.long_term_mem))][:batch_size-stm_batch_size] 
 							stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
 							stm_idx = [_idx for _, _idx in sorted(zip(stm_replay_count, self.short_term_mem))][:stm_batch_size]
 
@@ -213,13 +213,13 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 				else:
 					ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
-					ltm_idx = [_idx for _, _idx in sorted(zip(ltm_replay_count, self.long_term_mem))][:batch_size-stm_batch_size] 		
+					ltm_idx = [_idx for _, _idx in sorted(zip(ltm_replay_count, self.long_term_mem))][:batch_size-stm_batch_size]
 					stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
 					stm_idx = [_idx for _, _idx in sorted(zip(stm_replay_count, self.short_term_mem))][:stm_batch_size]
 				
 			else:
-			ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
-			stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
+				ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
+				stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 
 			self.ltm_batches[curr, :] = np.array([self.long_term_mem[_idx] for _idx in ltm_ix])
 			self.stm_batches[curr, :] = np.array([self.short_term_mem[_idx] for _idx in stm_ix])
