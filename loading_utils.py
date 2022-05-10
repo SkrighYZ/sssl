@@ -163,7 +163,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		curr = 0
 		curr_clip = -1
 		ltm_indices = list(range(len(self.long_term_mem)))
-		stm_indices = list(range(len(self.short_term_mem)))
 		for t in tqdm(range(num_examples)):
 			curr_clip += self.shot_bounds[t]
 			if epoch == 0:
@@ -179,22 +178,18 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					self.ltm_batches[curr, :] = np.array(self.long_term_mem)
 					self.stm_batches[curr, :] = np.array(self.short_term_mem)
 				else:
+					stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 					if selection_policy == 'min-replay':
 						if t < warmup_steps:
 							ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
-							stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 						else:
 							ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
-							ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, ltm_indices))][:batch_size-stm_batch_size] 
-							stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
-							stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, stm_indices))][:stm_batch_size]
+							ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, ltm_indices))][:batch_size-stm_batch_size]
 
 						replay_count[[self.long_term_mem[_idx] for _idx in ltm_ix]] += 1
 						replay_count[[self.short_term_mem[_idx] for _idx in stm_ix]] += 1
-
 					else:
 						ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
-						stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 
 					self.ltm_batches[curr, :] = np.array([self.long_term_mem[_idx] for _idx in ltm_ix])
 					self.stm_batches[curr, :] = np.array([self.short_term_mem[_idx] for _idx in stm_ix])
@@ -208,14 +203,12 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.ltm_batches[curr, :] = np.array(self.long_term_mem)
 			self.stm_batches[curr, :] = np.array(self.short_term_mem)
 		else:
+			stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 			if selection_policy == 'min-replay':
 				ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
-				ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, ltm_indices))][:batch_size-stm_batch_size] 
-				stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
-				stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, stm_indices))][:stm_batch_size]
+				ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, ltm_indices))][:batch_size-stm_batch_size]
 			else:
 				ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
-				stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 
 			self.ltm_batches[curr, :] = np.array([self.long_term_mem[_idx] for _idx in ltm_ix])
 			self.stm_batches[curr, :] = np.array([self.short_term_mem[_idx] for _idx in stm_ix])
