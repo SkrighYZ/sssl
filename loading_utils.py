@@ -137,9 +137,12 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			for t in range(ltm_size):
 				if self.shot_bounds[t] == 1:
 					curr_clip += 1
-				if t < stm_size:
-					self.stm_clip += [curr_clip]
 				self.ltm_clip += [curr_clip]
+			curr_clip = -1
+			for t in range(stm_size):
+				if self.shot_bounds[t] == 1:
+					curr_clip += 1
+				self.stm_clip += [curr_clip]
 		else:
 			# Treat all samples from last epoch as from different clips as the ones in the new epoch
 			self.ltm_clip = [min(c, -c) for c in self.ltm_clip]
@@ -163,14 +166,11 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		for t in tqdm(range(num_examples)):
 			curr_clip += self.shot_bounds[t]
 			if epoch == 0:
-				if t < len(self.short_term_mem):
-					pass
-				elif t < len(self.long_term_mem):
-					self.update_memory(t, curr_clip, update_ltm=False)
-				else:
-					self.update_memory(t, curr_clip, update_ltm=True)
+				update_ltm = (t < len(self.long_term_mem))
+				update_stm = (t < len(self.short_term_mem))
+				self.update_memory(t, curr_clip, update_ltm=update_ltm, update_stm=update_stm)
 			else:
-				self.update_memory(t, curr_clip, update_ltm=True)
+				self.update_memory(t, curr_clip)
 
 			if (t+1) % batch_size == 0:
 				rehearsal_idxs = self.long_term_mem + self.short_term_mem
@@ -227,9 +227,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.batches[curr, :] = np.concatenate([self.ltm_batches[curr, :], self.stm_batches[curr, :]])
 
 
-	def update_memory(self, t, curr_clip, update_ltm=True):
+	def update_memory(self, t, curr_clip, update_ltm=True, update_stm=True):
 
-		# Assume long term memory is larger
+		# Update long term memory
 		if update_ltm:
 			# Update long term memory
 			replace_idx = randint(0, t+1)
@@ -246,22 +246,23 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			replace_idx = randint(0, t+1)
 
 		# Update short term memory
-		replace_idx = randint(0, self.stm_span+1)
+		if update_stm:
+			replace_idx = randint(0, self.stm_span+1)
 
-		if self.use_boundary:
-			temp = self.stm_clip + [curr_clip]
-			most_freq_clip = max(temp, key=temp.count)
-			if temp.count(most_freq_clip) > 1:
-				replace_idx = random.choice([i for i, clip in enumerate(self.stm_clip) if clip == most_freq_clip])
+			if self.use_boundary:
+				temp = self.stm_clip + [curr_clip]
+				most_freq_clip = max(temp, key=temp.count)
+				if temp.count(most_freq_clip) > 1:
+					replace_idx = random.choice([i for i, clip in enumerate(self.stm_clip) if clip == most_freq_clip])
 
-		if replace_idx < len(self.short_term_mem):
-			# if np.max(self.stm_time_passed) > self.stm_span:
-			# 	replace_idx = np.argmax(self.stm_time_passed)
-			# self.stm_time_passed[replace_idx] = 0
-			self.short_term_mem[replace_idx] = t
-			self.stm_clip[replace_idx] = curr_clip
-		
-		# self.stm_time_passed += 1
+			if replace_idx < len(self.short_term_mem):
+				# if np.max(self.stm_time_passed) > self.stm_span:
+				# 	replace_idx = np.argmax(self.stm_time_passed)
+				# self.stm_time_passed[replace_idx] = 0
+				self.short_term_mem[replace_idx] = t
+				self.stm_clip[replace_idx] = curr_clip
+			
+			# self.stm_time_passed += 1
 
 
 
