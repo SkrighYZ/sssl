@@ -64,7 +64,7 @@ class Stream51Dataset(data.Dataset):
         targets (list): The class_index value for each image in the dataset
     """
 
-    def __init__(self, root, test=False, ordering=None, transform=None, bbox_crop=True, ratio=1.10):
+    def __init__(self, root, test=False, ordering, transform, mixup=False, alpha=2, bbox_crop=True, ratio=1.10):
 
         if test:
             self.samples = json.load(open(os.path.join(root, 'Stream-51_meta_test.json')))
@@ -90,6 +90,13 @@ class Stream51Dataset(data.Dataset):
         self.bbox_crop = bbox_crop
         self.ratio = ratio
 
+        # self.mixup = mixup
+        # self.mixup_index = None
+        # self.mixup_lambd = None
+        # if self.mixup:
+        #     self.mixup_lambd = np.random.beta(alpha, alpha, len(samples))
+
+
     def __getitem__(self, index):
         """
         Args:
@@ -97,27 +104,51 @@ class Stream51Dataset(data.Dataset):
         Returns:
             tuple: (sample, target) where target is class_index of the target class.
         """
+
+        # if self.mixup:
+        #     index1, index2 = self.mixup_index[index]
+        #     fpath1, target = self.samples[index1][-1], self.targets[index1]
+        #     sample1 = self.loader(os.path.join(self.root, fpath1))
+        #     fpath2, _ = self.samples[index2][-1], self.targets[index2]
+        #     sample2 = self.loader(os.path.join(self.root, fpath2))
+        #     if self.bbox_crop:
+        #         sample1 = self._crop(sample1)
+        #         sample2 = self._crop(sample2)
+        #     if self.transform is not None:
+        #         sample1 = self.transform(sample1)
+        #         sample2 = self.transform(sample2)
+
+        #     sample = self.mixup_lambd[index] * sample1 + (1 - self.mixup_lambd[index]) * sample2
+
         index = int(index)
         fpath, target = self.samples[index][-1], self.targets[index]
         sample = self.loader(os.path.join(self.root, fpath))
+        
         if self.bbox_crop:
-            bbox = self.samples[index][-2]
-            cw = bbox[0] - bbox[1];
-            ch = bbox[2] - bbox[3];
-            center = [int(bbox[1] + cw / 2), int(bbox[3] + ch / 2)]
-            bbox = [min([int(center[0] + (cw * self.ratio / 2)), sample.size[0]]),
-                    max([int(center[0] - (cw * self.ratio / 2)), 0]),
-                    min([int(center[1] + (ch * self.ratio / 2)), sample.size[1]]),
-                    max([int(center[1] - (ch * self.ratio / 2)), 0])]
-            sample = sample.crop((bbox[1],
-                                  bbox[3],
-                                  bbox[0],
-                                  bbox[2]))
+            sample = self._crop(sample)
 
         if self.transform is not None:
             sample = self.transform(sample)
 
         return sample, target
+
+
+
+    def _crop(self, sample):
+        bbox = self.samples[index][-2]
+        cw = bbox[0] - bbox[1];
+        ch = bbox[2] - bbox[3];
+        center = [int(bbox[1] + cw / 2), int(bbox[3] + ch / 2)]
+        bbox = [min([int(center[0] + (cw * self.ratio / 2)), sample.size[0]]),
+                max([int(center[0] - (cw * self.ratio / 2)), 0]),
+                min([int(center[1] + (ch * self.ratio / 2)), sample.size[1]]),
+                max([int(center[1] - (ch * self.ratio / 2)), 0])]
+        sample = sample.crop((bbox[1],
+                              bbox[3],
+                              bbox[0],
+                              bbox[2]))
+        return sample
+
 
     def __len__(self):
         return len(self.samples)

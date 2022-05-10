@@ -67,7 +67,8 @@ def train(args, model, device='cuda:0'):
 			print('Simulating batches...')
 			replay_sampler.get_shot_bounds(dataset.shot_bounds, args.corrupt_rate)
 			replay_sampler.init_memory(ltm_size=MEMORY_LIMIT-args.stm_size, stm_size=args.stm_size, ex2ex_mapping=ex2ex_mapping)
-			replay_sampler.simulate_batches(batch_size=args.batch_size, stm_batch_size=args.stm_batch_size, num_examples=len(dataset), epoch=epoch)
+			replay_sampler.simulate_batches(batch_size=args.batch_size, stm_batch_size=args.stm_batch_size, 
+												num_examples=len(dataset), epoch=epoch, selection_policy=args.selection_policy)
 
 			if epoch == 0:
 				pickle.dump(dataset.samples, open(args.save_dir / 'samples.pkl', 'wb'))
@@ -151,6 +152,7 @@ def main():
 
 	parser.add_argument("--use_boundary", action='store_true')
 	parser.add_argument('--corrupt_rate', type=float, default=0.1)
+	parser.add_argument('--selection_policy', type=str, default=None, choices=[None, 'min-replay'])
 
 	parser.add_argument('--epochs', type=int, default=5)
 	parser.add_argument('--warmup_epochs', type=int, default=1)

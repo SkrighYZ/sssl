@@ -270,9 +270,9 @@ def get_stream_data_loaders(args):
 
 	if args.dataset == 'stream51':
 		if 'supervised' in args.model:
-			dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=Transform(), bbox_crop=True, ratio=1.10)
+			dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=Transform())
 		else:
-			dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=SSLTransform(), bbox_crop=True, ratio=1.10)
+			dataset = Stream51Dataset(args.images_dir, ordering=args.order, transform=SSLTransform())
 	else:
 		raise NotImplementedError
 
