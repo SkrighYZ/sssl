@@ -17,6 +17,8 @@ from models import BarlowTwins, SimCLR, ResNet18
 
 from loading_utils import get_stream_data_loaders
 
+MEMORY_LIMIT = 256
+
 def adjust_learning_rate(args, optimizer, loader, step):
 	max_steps = args.epochs * len(loader)
 	warmup_steps = args.warmup_epochs * len(loader)
@@ -64,7 +66,7 @@ def train(args, model, device='cuda:0'):
 		if replay_sampler is not None:
 			print('Simulating batches...')
 			replay_sampler.get_shot_bounds(dataset.shot_bounds, args.corrupt_rate)
-			replay_sampler.init_memory(ltm_size=args.ltm_size, stm_size=args.stm_size, ex2ex_mapping=ex2ex_mapping)
+			replay_sampler.init_memory(ltm_size=MEMORY_LIMIT-args.stm_size, stm_size=args.stm_size, ex2ex_mapping=ex2ex_mapping)
 			replay_sampler.simulate_batches(batch_size=args.batch_size, stm_batch_size=args.stm_batch_size, num_examples=len(dataset), epoch=epoch)
 
 			if epoch == 0:
@@ -144,7 +146,6 @@ def main():
 
 	parser.add_argument('--batch_size', type=int, default=128)
 	parser.add_argument('--stm_batch_size', type=int, default=64)
-	parser.add_argument('--ltm_size', type=int, default=128)
 	parser.add_argument('--stm_size', type=int, default=128)
 	parser.add_argument('--stm_span', type=int, default=1500)
 
