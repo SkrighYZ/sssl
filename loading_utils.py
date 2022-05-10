@@ -257,10 +257,11 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		if replace_idx < len(self.short_term_mem):
 			# if np.max(self.stm_time_passed) > self.stm_span:
 			# 	replace_idx = np.argmax(self.stm_time_passed)
+			# self.stm_time_passed[replace_idx] = 0
 			self.short_term_mem[replace_idx] = t
-			self.stm_time_passed[replace_idx] = 0
 			self.stm_clip[replace_idx] = curr_clip
-		self.stm_time_passed += 1
+		
+		# self.stm_time_passed += 1
 
 
 

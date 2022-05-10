@@ -25,8 +25,8 @@ python main.py \
 	--mode train \
 	--order instance \
 	--model reservoir_bt \
-	--stm_size 2 \
-	--stm_batch_size 1 \
+	--stm_size 8 \
+	--stm_batch_size 4 \
 	--stm_span 1500 \
 	--batch_size 128 \
 	--epochs 10 \
