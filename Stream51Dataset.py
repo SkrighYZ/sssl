@@ -125,7 +125,7 @@ class Stream51Dataset(data.Dataset):
         sample = self.loader(os.path.join(self.root, fpath))
         
         if self.bbox_crop:
-            sample = self._crop(sample)
+            sample = self._crop(sample, index)
 
         if self.transform is not None:
             sample = self.transform(sample)
@@ -134,7 +134,7 @@ class Stream51Dataset(data.Dataset):
 
 
 
-    def _crop(self, sample):
+    def _crop(self, sample, index):
         bbox = self.samples[index][-2]
         cw = bbox[0] - bbox[1];
         ch = bbox[2] - bbox[3];
