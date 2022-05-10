@@ -149,7 +149,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.stm_clip = [min(c, -c) for c in self.stm_clip]
 
 
-	def simulate_batches(self, batch_size, stm_batch_size, num_examples, epoch, selection_policy=None):
+	def simulate_batches(self, batch_size, stm_batch_size, num_examples, epoch, selection_policy=None, warmup_steps=50):
 
 		self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
 
@@ -158,7 +158,6 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.stm_batches = np.zeros((num_examples//batch_size+1, stm_batch_size), dtype=int)
 
 		if selection_policy == 'min-replay':
-			warmup_steps = 50
 			replay_count = np.zeros(num_examples)
 
 		curr = 0
@@ -187,6 +186,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 							ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, self.long_term_mem))][:batch_size-stm_batch_size] 
 							stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
 							stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, self.short_term_mem))][:stm_batch_size]
+
+							print(ltm_ix, stm_ix)
 
 						replay_count[ltm_ix] += 1
 						replay_count[stm_ix] += 1
