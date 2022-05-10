@@ -162,6 +162,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
 		curr = 0
 		curr_clip = -1
+		ltm_indices = list(len(self.long_term_mem))
+		stm_indices = list(len(self.short_term_mem))
 		for t in tqdm(range(num_examples)):
 			curr_clip += self.shot_bounds[t]
 			if epoch == 0:
@@ -183,11 +185,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 							stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 						else:
 							ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
-							ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, self.long_term_mem))][:batch_size-stm_batch_size] 
+							ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, ltm_indices))][:batch_size-stm_batch_size] 
 							stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
-							stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, self.short_term_mem))][:stm_batch_size]
-
-							print(ltm_ix, stm_ix)
+							stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, stm_indices))][:stm_batch_size]
 
 						replay_count[ltm_ix] += 1
 						replay_count[stm_ix] += 1
@@ -214,9 +214,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
 				else:
 					ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
-					ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, self.long_term_mem))][:batch_size-stm_batch_size]
+					ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, ltm_indices))][:batch_size-stm_batch_size] 
 					stm_replay_count = [replay_count[_idx] for _idx in self.short_term_mem]
-					stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, self.short_term_mem))][:stm_batch_size]
+					stm_ix = [_idx for _, _idx in sorted(zip(stm_replay_count, stm_indices))][:stm_batch_size]
 				
 			else:
 				ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
