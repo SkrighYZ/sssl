@@ -166,8 +166,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		for t in tqdm(range(num_examples)):
 			curr_clip += self.shot_bounds[t]
 			if epoch == 0:
-				update_ltm = !(t < len(self.long_term_mem))
-				update_stm = !(t < len(self.short_term_mem))
+				update_ltm = not (t < len(self.long_term_mem))
+				update_stm = not (t < len(self.short_term_mem))
 				self.update_memory(t, curr_clip, update_ltm=update_ltm, update_stm=update_stm)
 			else:
 				self.update_memory(t, curr_clip)
