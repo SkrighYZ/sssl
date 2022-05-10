@@ -162,8 +162,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
 		curr = 0
 		curr_clip = -1
-		ltm_indices = list(len(self.long_term_mem))
-		stm_indices = list(len(self.short_term_mem))
+		ltm_indices = list(range(len(self.long_term_mem)))
+		stm_indices = list(range(len(self.short_term_mem)))
 		for t in tqdm(range(num_examples)):
 			curr_clip += self.shot_bounds[t]
 			if epoch == 0:
