@@ -73,6 +73,7 @@ def train(args, model, device='cuda:0'):
 				pickle.dump(dataset.samples, open(args.save_dir / 'samples.pkl', 'wb'))
 				pickle.dump(replay_sampler.stm_batches, open(args.save_dir / 'stm_batches.pkl', 'wb'))
 				pickle.dump(replay_sampler.ltm_batches, open(args.save_dir / 'ltm_batches.pkl', 'wb'))
+				sys.exit()
 
 		loss_total = 0
 		for step, (y, labels) in enumerate(train_loader, start=epoch*len(train_loader)):
