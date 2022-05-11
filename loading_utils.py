@@ -80,7 +80,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	eligible for rehearsal.
 	"""
 
-	def __init__(self, stm_span, use_boundary=False, selection_policy=None, min_replay_warmup=50):
+	def __init__(self, stm_span, use_boundary=False, selection_policy=None, warmup_steps=50):
 
 		self.stm_span = stm_span
 
@@ -102,7 +102,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.ltm_batches = None
 
 		self.selection_policy = selection_policy
-		self.min_replay_warmup = min_replay_warmup
+		self.warmup_steps = warmup_steps
 
 		self.rng = default_rng(seed=os.getpid())
 
@@ -233,7 +233,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					replace_idx = random.choice([i for i, clip in enumerate(self.ltm_clip) if clip == most_freq_clip])
 			
 			if replace_idx < len(self.long_term_mem):
-				if self.selection_policy == 'min-replay' and t > self.warmup_steps:
+				if self.selection_policy == 'min-replay' and t >= self.warmup_steps:
 					ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
 					max_replay_count = max(ltm_replay_count)
 					replace_idx = random.choice([i for i, cnt in enumerate(ltm_replay_count) if cnt == max_replay_count])
