@@ -160,8 +160,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.ltm_batches = np.zeros((num_examples//batch_size+1, batch_size-stm_batch_size), dtype=int)
 		self.stm_batches = np.zeros((num_examples//batch_size+1, stm_batch_size), dtype=int)
 
-		if self.selection_policy == 'min-replay':
-			replay_count = np.zeros(num_examples)
+		replay_count = np.zeros(num_examples) if self.selection_policy == 'min-replay' else None
 
 		curr = 0
 		curr_clip = -1
@@ -171,9 +170,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			if epoch == 0:
 				update_ltm = not (t < len(self.long_term_mem))
 				update_stm = not (t < len(self.short_term_mem))
-				self.update_memory(t, curr_clip, update_ltm=update_ltm, update_stm=update_stm)
+				self.update_memory(t, curr_clip, update_ltm=update_ltm, update_stm=update_stm, replay_count=replay_count)
 			else:
-				self.update_memory(t, curr_clip)
+				self.update_memory(t, curr_clip, replay_count=replay_count)
 
 			if (t+1) % batch_size == 0:
 				rehearsal_idxs = self.long_term_mem + self.short_term_mem
