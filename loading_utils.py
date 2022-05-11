@@ -80,7 +80,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	eligible for rehearsal.
 	"""
 
-	def __init__(self, stm_span, use_boundary=False):
+	def __init__(self, stm_span, use_boundary=False, selection_policy=None, min_replay_warmup=50):
 
 		self.stm_span = stm_span
 
@@ -100,6 +100,9 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 
 		self.stm_batches = None
 		self.ltm_batches = None
+
+		self.selection_policy = selection_policy
+		self.min_replay_warmup = min_replay_warmup
 
 		self.rng = default_rng(seed=os.getpid())
 
@@ -149,7 +152,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.stm_clip = [min(c, -c) for c in self.stm_clip]
 
 
-	def simulate_batches(self, batch_size, stm_batch_size, num_examples, epoch, selection_policy=None, warmup_steps=50):
+	def simulate_batches(self, batch_size, stm_batch_size, num_examples, epoch):
 
 		self.batches = np.zeros((num_examples//batch_size+1, batch_size), dtype=int)
 
@@ -179,8 +182,8 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					self.stm_batches[curr, :] = np.array(self.short_term_mem)
 				else:
 					stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
-					if selection_policy == 'min-replay':
-						if t < warmup_steps:
+					if self.selection_policy == 'min-replay':
+						if t < self.warmup_steps:
 							ltm_ix = self.rng.choice(len(self.long_term_mem), batch_size-stm_batch_size, replace=False)
 						else:
 							ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
@@ -204,7 +207,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 			self.stm_batches[curr, :] = np.array(self.short_term_mem)
 		else:
 			stm_ix = self.rng.choice(len(self.short_term_mem), stm_batch_size, replace=False)
-			if selection_policy == 'min-replay':
+			if self.selection_policy == 'min-replay':
 				ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
 				ltm_ix = [_idx for _, _idx in sorted(zip(ltm_replay_count, ltm_indices))][:batch_size-stm_batch_size]
 			else:
@@ -216,7 +219,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.batches[curr, :] = np.concatenate([self.ltm_batches[curr, :], self.stm_batches[curr, :]])
 
 
-	def update_memory(self, t, curr_clip, update_ltm=True, update_stm=True):
+	def update_memory(self, t, curr_clip, update_ltm=True, update_stm=True, replay_count=None):
 
 		# Update long term memory
 		if update_ltm:
@@ -228,8 +231,12 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 				most_freq_clip = max(temp, key=temp.count)
 				if temp.count(most_freq_clip) > 1:
 					replace_idx = random.choice([i for i, clip in enumerate(self.ltm_clip) if clip == most_freq_clip])
-
+			
 			if replace_idx < len(self.long_term_mem):
+				if self.selection_policy == 'min-replay' and t > self.warmup_steps:
+					ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
+					max_replay_count = max(ltm_replay_count)
+					replace_idx = random.choice([i for i, cnt in enumerate(ltm_replay_count) if cnt == max_replay_count])
 				self.long_term_mem[replace_idx] = t
 				self.ltm_clip[replace_idx] = curr_clip
 			replace_idx = randint(0, t+1)
@@ -272,7 +279,7 @@ def get_stream_data_loaders(args):
 		drop_last = True if args.model == 'sliding_simclr' else False
 		train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=shuffle, drop_last=drop_last, num_workers=args.num_workers, pin_memory=True)
 	else:
-		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, use_boundary=args.use_boundary)
+		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, use_boundary=args.use_boundary, selection_policy=args.selection_policy)
 		train_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
 	return dataset, train_loader, replay_sampler
