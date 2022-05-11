@@ -160,7 +160,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.ltm_batches = np.zeros((num_examples//batch_size+1, batch_size-stm_batch_size), dtype=int)
 		self.stm_batches = np.zeros((num_examples//batch_size+1, stm_batch_size), dtype=int)
 
-		if selection_policy == 'min-replay':
+		if self.selection_policy == 'min-replay':
 			replay_count = np.zeros(num_examples)
 
 		curr = 0
