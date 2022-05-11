@@ -14,8 +14,7 @@ samples = pickle.load(open('../sssl-ws/' + save_dir + '/samples.pkl', 'rb'))
 stm_batches = pickle.load(open('../sssl-ws/' + save_dir + '/stm_batches.pkl', 'rb'))
 ltm_batches = pickle.load(open('../sssl-ws/' + save_dir + '/ltm_batches.pkl', 'rb'))
 
-print(stm_batches[:2])
-print(stm_batches[-2:])
+print(ltm_batches[-5:])
 
 clip_labels = []
 curr_clip = -1

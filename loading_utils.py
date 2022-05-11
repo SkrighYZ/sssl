@@ -236,6 +236,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
 					max_replay_count = max(ltm_replay_count)
 					replace_idx = random.choice([i for i, cnt in enumerate(ltm_replay_count) if cnt == max_replay_count])
+					print(max_replay_count)
 				self.long_term_mem[replace_idx] = t
 				self.ltm_clip[replace_idx] = curr_clip
 			replace_idx = randint(0, t+1)
