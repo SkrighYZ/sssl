@@ -152,6 +152,7 @@ def main():
 	parser.add_argument("--use_boundary", action='store_true')
 	parser.add_argument('--corrupt_rate', type=float, default=0.1)
 	parser.add_argument('--selection_policy', type=str, default=None, choices=[None, 'min-replay'])
+	parser.add_argument('--store_policy', type=str, default=None, choices=[None, 'min-replay'])
 
 	parser.add_argument('--epochs', type=int, default=5)
 	parser.add_argument('--warmup_epochs', type=int, default=1)

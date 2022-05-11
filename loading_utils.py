@@ -80,7 +80,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 	eligible for rehearsal.
 	"""
 
-	def __init__(self, stm_span, use_boundary=False, selection_policy=None, warmup_steps=50):
+	def __init__(self, stm_span, use_boundary=False, selection_policy=None, store_policy=None, warmup_steps=50):
 
 		self.stm_span = stm_span
 
@@ -102,6 +102,7 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 		self.ltm_batches = None
 
 		self.selection_policy = selection_policy
+		self.store_policy = store_policy
 		self.warmup_steps = warmup_steps
 
 		self.rng = default_rng(seed=os.getpid())
@@ -232,11 +233,10 @@ class RehearsalBatchSampler(torch.utils.data.Sampler):
 					replace_idx = random.choice([i for i, clip in enumerate(self.ltm_clip) if clip == most_freq_clip])
 			
 			if replace_idx < len(self.long_term_mem):
-				if self.selection_policy == 'min-replay' and t >= self.warmup_steps:
+				if self.store_policy == 'min-replay' and t >= self.warmup_steps:
 					ltm_replay_count = [replay_count[_idx] for _idx in self.long_term_mem]
 					max_replay_count = max(ltm_replay_count)
 					replace_idx = random.choice([i for i, cnt in enumerate(ltm_replay_count) if cnt == max_replay_count])
-					print(self.long_term_mem)
 				self.long_term_mem[replace_idx] = t
 				self.ltm_clip[replace_idx] = curr_clip
 			replace_idx = randint(0, t+1)
@@ -279,7 +279,8 @@ def get_stream_data_loaders(args):
 		drop_last = True if args.model == 'sliding_simclr' else False
 		train_loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=shuffle, drop_last=drop_last, num_workers=args.num_workers, pin_memory=True)
 	else:
-		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, use_boundary=args.use_boundary, selection_policy=args.selection_policy)
+		replay_sampler = RehearsalBatchSampler(stm_span=args.stm_span, 
+			use_boundary=args.use_boundary, selection_policy=args.selection_policy, store_policy=args.store_policy)
 		train_loader = DataLoader(dataset, batch_sampler=replay_sampler, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
 	return dataset, train_loader, replay_sampler
