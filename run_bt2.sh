@@ -48,7 +48,7 @@ python main.py \
 	--print_freq 400 \
 	--save_freq 5 \
 	--projector 2048-2048 \
-	--save_dir ../models/r_m_simclr_s128_b128_sb64
+	--save_dir ../models/r_m_simclr_s128_b128_sb64 \
 	--selection_policy min-replay
 	# --store_policy min-replay \
 	# --corrupt_rate 0.1 \
