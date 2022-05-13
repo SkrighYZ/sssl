@@ -5,6 +5,10 @@ from PIL import Image
 import torch.utils.data as data
 import copy
 
+#######
+# Code adapted from https://github.com/tyler-hayes/Stream-51
+#####
+
 
 def instance_ordering(data_list):
     # organize data by video

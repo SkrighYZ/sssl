@@ -3,6 +3,12 @@ import torch.nn as nn
 import torchvision
 
 
+#######
+# Code adapted from https://github.com/facebookresearch/barlowtwins, https://github.com/google-research/simclr
+#####
+
+
+
 def off_diagonal(x):
     # return a flattened view of the off-diagonal elements of a square matrix
     n, m = x.shape
