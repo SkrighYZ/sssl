@@ -7,7 +7,7 @@ import seaborn as sns
 
 stm_span = np.array([500, 1000, 1500, 2000, 3000])
 bt_acc = [10.59, 11.44, 15.22, 15.35, 16.32]
-simclr_acc = [19.05, 19, 18.88, 19, 19.13]
+simclr_acc = [19.05, 19.56, 18.88, 19.19, 19.13]
 
 plt.style.use('seaborn')
 
