@@ -80,7 +80,7 @@ python main.py \
 	--order instance \
 	--model sliding_simclr \
 	--batch_size 128 \
-	--epochs 10 \
+	--epochs 8 \
 	--warmup_epochs 1 \
 	--learning_rate_weights 0.15 \
 	--learning_rate_biases 0.005 \
